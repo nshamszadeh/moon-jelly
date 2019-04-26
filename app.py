@@ -1,3 +1,7 @@
+import os
+import sys
+import logging
+
 from flask import Flask
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -69,6 +73,10 @@ def grid():
 def users():
   u = User.query.all()
   return '<br/>'.join([a.email for a in u])
+
+if 'DYNO' in os.environ:
+  # extra logging for heroku
+  app.loggeer.addHandler(logging.StreamHandler(sys.stdout))
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
