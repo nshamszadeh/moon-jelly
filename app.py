@@ -1,10 +1,13 @@
 import os
 
-from flask import Flask, render_template, request, redirect
+from flask import make_response, Flask, render_template, request, redirect, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from forms import LoginForm, UserForm, DeleteForm
 from flask_table import Table, Col
+from functools import wraps, update_wrapper
+from datetime import datetime
+
 
 # Some boilerplate setup stuff.
 
@@ -14,6 +17,8 @@ app = Flask(__name__)
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ricculxqdypnfh:d8283cc0c6d1c05d5874a972d5176b29c24751188711916086c6e4537f035274@ec2-23-21-136-232.compute-1.amazonaws.com:5432/dfuo44q4pq80o6'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
@@ -132,12 +137,18 @@ def homepage():
 return 
 
 """
+@app.route('/img/<path:path>')
+
+def send_js(path):
+    return send_from_directory('img', path)
 
 @app.route('/about')
+
 def about():
   return render_template('about.html')
 
 @app.route('/contact')
+
 def contact():
   return render_template('contact.html')
 
@@ -150,7 +161,14 @@ def schedule():
   return render_template('schedule.html', users=u, utable=utable)
 
 #create a log in page
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+
+def homepage():
+  return render_template('home.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+
 def login():
   form = LoginForm()
   if request.method == 'POST':
@@ -163,6 +181,7 @@ def login():
 
 #test to print out the first names of users 
 @app.route('/users')
+
 def users():
   u = User.query.all()
   utable = UserTable(u)
