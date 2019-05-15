@@ -1,10 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <div class="jumbotron text-center">
-        <h1>Welcome To FlaskApp</h1>
-        <p class="lead">This application is built on the Python Flask framework and is to help planning schedules for doctors</p>
-    </div>
+    <br>
     <form action="" method="POST">
             {% for field in form  %}
             <p>
@@ -16,4 +13,6 @@
                 Submit
             </button>
         </form>
+        <br>
+        <br>
 {% endblock %}
