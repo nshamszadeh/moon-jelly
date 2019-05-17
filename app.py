@@ -1,17 +1,20 @@
 import os
-
+import ctypes
+import subprocess
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from forms import LoginForm, UserForm, DeleteForm
 from flask_table import Table, Col
+from flask import Flask, flash, redirect, render_template, \
+     request, url_for
 
 # Some boilerplate setup stuff.
 
 app = Flask(__name__)
 
 # URL should be whatever database URL is being used (if testing on your own use a database different from the team's )
-
+                           
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 
@@ -43,13 +46,19 @@ class User(db.Model):
     self.last_name = last_name
     self.specialty = specialty
 
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxA(0, text, title, style)
+
 class UserTable(Table):
     id = Col('id')
     first_name = Col('First Name')
     last_name = Col('Last Name')
     specialty = Col('Specialty')
     email = Col('Email')
-  
+'''
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxA(0, text, title, style) 
+    ''' 
 #user_form = UserForm()
 # This is the main homepage for now. GET and POST are for web forms.
 @app.route('/add', methods = ['GET', 'POST'])
@@ -74,7 +83,7 @@ def add():
       return redirect('/schedule')#go to schedule after submit  ####This doesn't seem to work?
     else:
       print("Invalid input(s)!")
-
+      
   # add html file here
   return render_template('add.html', form = user_form)
 
@@ -97,6 +106,7 @@ def remove():
         print("User First Name Not Found")
     else:
       print("Invalid input(s)!")
+      #Mbox('Warning!', 'Email is not correct!', 0)
 
   # add html file here
   return render_template('remove.html', delete_form = delete_form)
@@ -139,7 +149,12 @@ def about():
 
 @app.route('/contact')
 def contact():
-  return render_template('contact.html')
+  try:
+    message = subprocess.check_output(['hi'], shell=True)
+  except:
+    message = "Sorry, we coundn't run that command..."
+  #dir:command you want to run(name)
+  return render_template('contact.html', message=message)
 
 #create a schedule page
 @app.route('/schedule')
@@ -153,12 +168,14 @@ def schedule():
 @app.route('/', methods=['GET', 'POST'])
 def login():
   form = LoginForm()
-  if request.method == 'POST':
+  if request.method == 'POST' and form.validate():
     email = request.form['email']
     if User.query.filter_by(email=email).first():
       return redirect('/add')#go to schedule after submit 
     else:
-      print("Invalid input(s)!")
+      # print("Invalid input(s)!")
+      form.email.errors.append('Invalid Email!')
+
   return render_template('login.html', form=form)
 
 #test to print out the first names of users 
