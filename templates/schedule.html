@@ -3,6 +3,7 @@
 {% block body %}
 <table style="width:100%">
   <tr>
+    <th>   </th>
     <th>Mon</th>
     <th>Tue</th> 
     <th>Wed</th>
@@ -11,11 +12,26 @@
     <th>Sat</th>
     <th>Sun</th>
   </tr>
+
+<tr>
+    <th>pos #1</th>
+    {% for user in users %}
+    <!--<th>pos #1</th>-->
+    <th>{{user.first_name}}</th>
+    {% endfor %}
+ </tr>
+
+ <tr>
+    <th>pos #2</th>
+ </tr>
+
+<!--
 {% for user in users %}
   <tr>
 	    <td>{{ user.id }} - {{ user.first_name }} - {{ user.specialty}} </td>
   </tr>
 {% endfor %}
+-->
 
 
  <!--  <tr>

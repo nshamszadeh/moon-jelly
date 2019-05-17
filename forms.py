@@ -5,7 +5,7 @@ from wtforms import StringField, validators, SelectField #, IntegerField
 
 class LoginForm(FlaskForm):
 	email = StringField('Email', [validators.Email(message = 'Please Enter A Valid Email')])
-
+    
 class UserForm(FlaskForm):
 	specialties = [ ('Pediatrician', 'Pediatrician'), ('Cardiologist', 'Cardiologist'), 
 	('General Surgeon', 'General Surgeon'), ('Other', 'Other') ]
