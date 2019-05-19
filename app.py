@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from forms import LoginForm, UserForm, DeleteForm
+from forms import LoginForm, UserForm, DeleteForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
 from flask_table import Table, Col
 
 # Some boilerplate setup stuff.
@@ -24,10 +24,12 @@ app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAx
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
 
+#number_users = 3
+
 # Create our database model. 
 class User(db.Model):
 
-  __tablename__ = "users"
+  __tablename__ = "users" ##what does this do?
 
   # Each user (doctor) will have all these things attributed to him or her
   id = db.Column(db.Integer, primary_key=True)
@@ -49,8 +51,143 @@ class UserTable(Table):
     last_name = Col('Last Name')
     specialty = Col('Specialty')
     email = Col('Email')
+
+class ScheduleTable(Table):
+    
+    Sunday = Col('Sun')
+    Monday = Col('Mon')
+    Tuesday = Col('Tues')
+    Wednesday = Col('Weds')
+    Thursday = Col('Thrus')
+    Friday = Col("Fri")
+    Saturday = Col("Sat")
+
+#create a log in page
+@app.route('/', methods=['GET', 'POST'])
+def login():
+  form = LoginForm()
+  if request.method == 'POST':
+    email = request.form['email']
+    if User.query.filter_by(email=email).first():
+      return redirect('/add')#go to schedule after submit 
+    else:
+      print("Invalid input(s)!")
+  return render_template('login.html', form=form)
+
+
+@app.route('/make', methods=['GET', 'POST'])
+def make():
+  numuForm = NumberUsersForm()
+  global number_usersM  # This is gross, gonna find a way to pass variables from one page to another later
+  global number_usersT
+  global number_usersW
+  global number_usersTh
+  global number_usersF
+  global number_usersS
+  global number_usersSu
+
+  if request.method == 'POST':
+    number_usersM = int(request.form['NumberUsersM']) # THIS DOESNT HANDLE EDGE CASES YET, BREAKS IF YOU INPUT A NUMBER, GONNA NEED TO FIX
+    number_usersT = int(request.form['NumberUsersT'])
+    number_usersW = int(request.form['NumberUsersW'])
+    number_usersTh = int(request.form['NumberUsersTh'])
+    number_usersF = int(request.form['NumberUsersF'])
+    number_usersS = int(request.form['NumberUsersS'])
+    number_usersSu = int(request.form['NumberUsersSu'])
+    if numuForm.validate():
+      return redirect('/make2')
+  return render_template('make.html', numuForm = numuForm)
+
+@app.route('/make2', methods=['GET', 'POST'])
+def make2():
+  global Su1
+  Su1_1 = []
+  global M1 
+  M1_1 = []
+  global T1
+  T1_1 = []
+  global W1 
+  W1_1 = []
+  global Th1 
+  Th1_1 = []
+  global F1
+  F1_1 = []
+  global S1 
+  S1_1 = []
+
+
+  userfirstNamesSu = ["first_name"]*number_usersSu
+  userfirstNamesM = ["first_name"]*number_usersM
+  userfirstNamesT = ["first_name"]*number_usersT
+  userfirstNamesW = ["first_name"]*number_usersW
+  userfirstNamesTh = ["first_name"]*number_usersTh
+  userfirstNamesF = ["first_name"]*number_usersF
+  userfirstNamesS = ["first_name"]*number_usersS
+  SchedForm = ScheduleForm(request.form,
+                           userfirstNamesM=userfirstNamesM,
+                           userfirstNamesT=userfirstNamesT,
+                           userfirstNamesW=userfirstNamesW,
+                           userfirstNamesTh=userfirstNamesTh,
+                           userfirstNamesF=userfirstNamesF,
+                           userfirstNamesS=userfirstNamesS,
+                           userfirstNamesSu=userfirstNamesSu)
   
-#user_form = UserForm()
+
+  if request.method == 'POST':
+    
+    for entry in SchedForm.userfirstNamesSu.entries:
+      Su1_1.append(entry.data.get("first_name"))
+    Su1 = Su1_1
+    
+    for entry in SchedForm.userfirstNamesM.entries:
+      M1_1.append(entry.data.get("first_name"))
+    M1 = M1_1
+
+    for entry in SchedForm.userfirstNamesT.entries:
+      T1_1.append(entry.data.get("first_name"))
+    T1 = T1_1
+
+    for entry in SchedForm.userfirstNamesW.entries:
+      W1_1.append(entry.data.get("first_name"))
+    W1 = W1_1
+
+    for entry in SchedForm.userfirstNamesTh.entries:
+      Th1_1.append(entry.data.get("first_name"))
+    Th1 = Th1_1
+
+    for entry in SchedForm.userfirstNamesF.entries:
+      F1_1.append(entry.data.get("first_name"))
+    F1 = F1_1
+
+    for entry in SchedForm.userfirstNamesM.entries:
+      S1_1.append(entry.data.get("first_name"))
+    S1 = S1_1
+
+    if SchedForm.validate(): 
+      return(redirect('/schedule'))
+  
+  print("SchedForm.errors = ", SchedForm.errors)
+ 
+
+  return render_template('make2.html', schedForm = SchedForm)
+  
+
+    
+
+
+
+
+
+
+
+@app.route('/schedule2')
+def schedule2():
+  u = User.query.all()
+  utable = UserTable(u)
+
+  return render_template('schedule2.html', users=u, utable=utable)
+
+
 # This is the main homepage for now. GET and POST are for web forms.
 @app.route('/add', methods = ['GET', 'POST'])
 def add():
@@ -71,7 +208,7 @@ def add():
       new_user = User(email, first_name, last_name, specialty)
       db.session.add(new_user) # add to database
       db.session.commit() # for some reason we also need to commit it otherwise it won't add
-      return redirect('/schedule')#go to schedule after submit  ####This doesn't seem to work?
+      return redirect('/schedule')#go to schedule after submit
     else:
       print("Invalid input(s)!")
 
@@ -101,61 +238,10 @@ def remove():
   # add html file here
   return render_template('remove.html', delete_form = delete_form)
 
-"""
-
-from flask import Flask
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-app = Flask(__name__)
-app.config.from_object('config.DevelopmentConfig')
-db = SQLAlchemy(app)
-migrate=Migrate(app,db)
-# Create our database model
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
-
-    def __init__(self, email):
-        self.email = email
-
-    def __repr__(self):
-        return '<E-mail %r>' % self.email
-
-@app.route('/')
-def homepage():
-    the_time = datetime.now().strftime("%A, %d %b %Y %I:%M %p")
-
-# add html code here
-return 
-
-"""
-
 @app.route('/about')
 def about():
   return render_template('about.html')
 
-#create a schedule page
-@app.route('/schedule')
-def schedule():
-  u = User.query.all()
-  utable = UserTable(u)
-  #cardi = User.query.filter_by(specialty="cardiologist").all()
-  return render_template('schedule.html', users=u, utable=utable)
-
-#create a log in page
-@app.route('/', methods=['GET', 'POST'])
-def login():
-  form = LoginForm()
-  if request.method == 'POST':
-    email = request.form['email']
-    if User.query.filter_by(email=email).first():
-      return redirect('/add')#go to schedule after submit 
-    else:
-      print("Invalid input(s)!")
-  return render_template('login.html', form=form)
 
 #test to print out the first names of users 
 @app.route('/users')
@@ -163,6 +249,26 @@ def users():
   u = User.query.all()
   utable = UserTable(u)
   return render_template('users.html', utable=utable)
+
+  #create a schedule page
+@app.route('/schedule')
+def schedule():
+
+  Suulistloc = Su1
+  Mulistloc = M1
+  Tulistloc = T1
+  Wulistloc = W1
+  Thulistloc = Th1
+  Fulistloc = F1
+  Sulistloc = S1
+
+  return render_template('schedule.html', Suulist = Suulistloc, 
+                                         Mulist = Mulistloc, 
+                                         Tulist = Tulistloc, 
+                                         Wulist = Wulistloc, 
+                                         Thulist = Thulistloc, 
+                                         Fulist = Fulistloc, 
+                                         Sulist = Sulistloc)
 
 #return render_template('home.html', form = user_form)
 
