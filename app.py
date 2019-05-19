@@ -94,10 +94,45 @@ def login():
   return render_template('login.html', form=form)
 
 
-@app.route('/register', methods = ['GET', 'POST'])
-def register():
+
+
+
+@app.route('/add', methods = ['GET', 'POST'])
+def add():
+  
   # define a form object
   register_form = RegisterForm()
+
+  # if we are posting a form, i.e. submitting a form, store all the info in these variables
+  if request.method == 'POST':
+    first_name = request.form['first_name'] 
+    last_name = request.form['last_name']
+    email = request.form['email']
+    password = request.form['password']
+    is_cardio = request.form['is_cardio']
+
+    # if the inputs we're all validated by WTforms (improve validation later)
+    if register_form.validate(): 
+      # first hash the password
+      hashed_password = generate_password_hash(password, method = 'sha256') 
+      # then store info in an initialized User object and store the object in the database
+      new_user = User(email, first_name, last_name, True, is_cardio, hashed_password)
+      db.session.add(new_user) # add to database
+      db.session.commit() # for some reason we also need to commit it otherwise it won't add
+      return redirect('/schedule')#go to schedule after submit  ####This doesn't seem to work?
+    else:
+      print("Invalid input(s)!")
+      
+  # add html file here
+  return render_template('add.html', form = register_form)
+
+
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+
+  # define a form object
+  register_form = RegisterForm()
+
   if request.method == 'POST':
     first_name = request.form['first_name'] 
     last_name = request.form['last_name']

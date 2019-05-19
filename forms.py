@@ -13,7 +13,7 @@ class RegisterForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name', [validators.DataRequired(message = 'Please Enter Something')])
 	password = PasswordField('Password')
-	is_cardio = SelectField(u'Cardiologist?', choices=[(True, 'Yes'), (False, 'No')])
+	is_cardio = SelectField('Cardiologist?', choices=[(True, 'Yes'), (False, 'No')])
 
 class UserForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
