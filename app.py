@@ -100,21 +100,29 @@ def make():
 
 @app.route('/make2', methods=['GET', 'POST'])
 def make2():
-  global Su1
+
+
+  global Su1 
+  Su1 = None
   Su1_1 = []
-  global M1 
+  global M1
+  M1 = None
   M1_1 = []
-  global T1
+  global T1 
+  T1 = None
   T1_1 = []
   global W1 
+  W1 = None
   W1_1 = []
-  global Th1 
+  global Th1
+  Th1 = None
   Th1_1 = []
-  global F1
+  global F1 
+  F1 = None
   F1_1 = []
   global S1 
+  S1 = None
   S1_1 = []
-
 
   userfirstNamesSu = ["first_name"]*number_usersSu
   userfirstNamesM = ["first_name"]*number_usersM
