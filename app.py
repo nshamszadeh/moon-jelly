@@ -103,7 +103,7 @@ def make2():
 
 
   global Su1 
-  Su1 = None
+  Su1 = []
   Su1_1 = []
   global M1
   M1 = None
@@ -141,11 +141,17 @@ def make2():
                            userfirstNamesSu=userfirstNamesSu)
   
 
+
   if request.method == 'POST':
     
     for entry in SchedForm.userfirstNamesSu.entries:
       Su1_1.append(entry.data.get("first_name"))
-    Su1 = Su1_1
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        Su1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
+    #Su1 = Su1_1
     
     for entry in SchedForm.userfirstNamesM.entries:
       M1_1.append(entry.data.get("first_name"))
@@ -175,7 +181,7 @@ def make2():
       return(redirect('/schedule'))
   
   print("SchedForm.errors = ", SchedForm.errors)
- 
+  print("Su1 = ",Su1)
 
   return render_template('make2.html', schedForm = SchedForm)
   
