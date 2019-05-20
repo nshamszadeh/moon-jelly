@@ -42,6 +42,7 @@ class User(UserMixin, db.Model):
   last_name = db.Column(db.Text)
   is_admin = db.Column(db.Boolean)
   is_cardio = db.Column(db.Boolean)
+  initial = db.Column(db.Text)
   password = db.Column(db.Text)
 
   # initialize the object
@@ -51,7 +52,8 @@ class User(UserMixin, db.Model):
     self.last_name = last_name
     self.is_admin = is_admin
     self.is_cardio = is_cardio
-    self.password = password
+    self.password = password 
+    self.initial = first_name[0] + last_name[0]
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -70,6 +72,7 @@ class UserTable(Table):
     last_name = Col('Last Name')
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
+    initial = Col('Initials')
     password = Col('Password')
 
 @app.route('/')
