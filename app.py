@@ -24,6 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
+# w
 
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
