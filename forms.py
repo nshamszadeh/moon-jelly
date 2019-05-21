@@ -30,10 +30,10 @@ class ScheduleForm(FlaskForm):
 	userfirstNamesS = FieldList(FormField(ScheduleEntryForm), min_entries=1)
 
 class NumberUsersForm(FlaskForm):
-	NumberUsersM = IntegerField('# Working on Monday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersT = IntegerField('# Working on Tuesday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersW = IntegerField('# Working on Wednesday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersTh = IntegerField('# Working on Thursday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersF = IntegerField('# Working on Friday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersS = IntegerField('# Working on Saturday', [validators.DataRequired(message = 'Please Enter Something')])
-	NumberUsersSu = IntegerField('# Working on Sunday', [validators.DataRequired(message = 'Please Enter Something')])
+	NumberUsersM = IntegerField('# Working on Monday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersT = IntegerField('# Working on Tuesday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersW = IntegerField('# Working on Wednesday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersTh = IntegerField('# Working on Thursday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersF = IntegerField('# Working on Friday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersS = IntegerField('# Working on Saturday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	NumberUsersSu = IntegerField('# Working on Sunday', [validators.DataRequired(message = 'Please Enter Something')], default=1)

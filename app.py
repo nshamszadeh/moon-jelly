@@ -37,6 +37,7 @@ class User(db.Model):
   first_name = db.Column(db.Text)
   last_name = db.Column(db.Text)
   specialty = db.Column(db.Text)
+  initials = db.Column(db.Text)
 
   # initialize the object
   def __init__(self, email, first_name, last_name, specialty):
@@ -44,6 +45,7 @@ class User(db.Model):
     self.first_name = first_name
     self.last_name = last_name
     self.specialty = specialty
+    self.initials = first_name[0] + last_name[0]
 
 class UserTable(Table):
     id = Col('id')
@@ -51,6 +53,7 @@ class UserTable(Table):
     last_name = Col('Last Name')
     specialty = Col('Specialty')
     email = Col('Email')
+    initials = Col('initials')
 
 class ScheduleTable(Table):
     
@@ -61,6 +64,17 @@ class ScheduleTable(Table):
     Thursday = Col('Thrus')
     Friday = Col("Fri")
     Saturday = Col("Sat")
+
+    #def __init__(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday):
+
+
+
+
+
+
+
+
+
 
 #create a log in page
 @app.route('/', methods=['GET', 'POST'])
@@ -78,13 +92,21 @@ def login():
 @app.route('/make', methods=['GET', 'POST'])
 def make():
   numuForm = NumberUsersForm()
+
   global number_usersM  # This is gross, gonna find a way to pass variables from one page to another later
+#number_usersM = None
   global number_usersT
+#number_usersT = None
   global number_usersW
+#number_usersW = None
   global number_usersTh
+#number_usersTh = None
   global number_usersF
+#number_usersF = None
   global number_usersS
+#number_usersS = None
   global number_usersSu
+#number_usersSu = None
 
   if request.method == 'POST':
     number_usersM = int(request.form['NumberUsersM']) # THIS DOESNT HANDLE EDGE CASES YET, BREAKS IF YOU INPUT A NUMBER, GONNA NEED TO FIX
@@ -102,26 +124,37 @@ def make():
 def make2():
 
 
+  #global variables for making schedule
   global Su1 
-  Su1 = []
-  Su1_1 = []
+  #Su1 = None
   global M1
-  M1 = None
-  M1_1 = []
+  #M1 = None
   global T1 
-  T1 = None
-  T1_1 = []
+  #T1 = None
   global W1 
-  W1 = None
-  W1_1 = []
+  #W1 = None
   global Th1
-  Th1 = None
-  Th1_1 = []
+  #Th1 = None
   global F1 
-  F1 = None
-  F1_1 = []
+  #F1 = None
   global S1 
-  S1 = None
+  #S1 = None
+
+  #Su1 = None
+  #M1 = None
+  #T1 = None
+  #W1 = None
+  #Th1 = None
+  #F1 = None
+  #S1 = None
+
+  
+  Su1_1 = []
+  M1_1 = []
+  T1_1 = []
+  W1_1 = []
+  Th1_1 = []
+  F1_1 = []
   S1_1 = []
 
   userfirstNamesSu = ["first_name"]*number_usersSu
@@ -145,49 +178,73 @@ def make2():
   if request.method == 'POST':
     
     for entry in SchedForm.userfirstNamesSu.entries:
-      Su1_1.append(entry.data.get("first_name"))
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        Su1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        Su1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
       else:
         print("not a valid first name")
 
-    #Su1 = Su1_1
-    
-    for entry in SchedForm.userfirstNamesM.entries:
-      M1_1.append(entry.data.get("first_name"))
-    M1 = M1_1
+    Su1 = Su1_1
 
+    for entry in SchedForm.userfirstNamesM.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        M1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
+    M1 = M1_1
+    
     for entry in SchedForm.userfirstNamesT.entries:
-      T1_1.append(entry.data.get("first_name"))
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        T1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
     T1 = T1_1
 
     for entry in SchedForm.userfirstNamesW.entries:
-      W1_1.append(entry.data.get("first_name"))
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        W1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
     W1 = W1_1
 
     for entry in SchedForm.userfirstNamesTh.entries:
-      Th1_1.append(entry.data.get("first_name"))
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        Th1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
     Th1 = Th1_1
 
     for entry in SchedForm.userfirstNamesF.entries:
-      F1_1.append(entry.data.get("first_name"))
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        F1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
     F1 = F1_1
 
-    for entry in SchedForm.userfirstNamesM.entries:
-      S1_1.append(entry.data.get("first_name"))
+    for entry in SchedForm.userfirstNamesS.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        S1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+      else:
+        print("not a valid first name")
+
     S1 = S1_1
+
 
     if SchedForm.validate(): 
       return(redirect('/schedule'))
   
   print("SchedForm.errors = ", SchedForm.errors)
-  print("Su1 = ",Su1)
+  #print("Su1 = ",Su1)
 
   return render_template('make2.html', schedForm = SchedForm)
   
 
     
-
+###WRITE A BEEEG SORTING FUNCTION, then export it to qi's table?
 
 
 
@@ -222,7 +279,7 @@ def add():
       new_user = User(email, first_name, last_name, specialty)
       db.session.add(new_user) # add to database
       db.session.commit() # for some reason we also need to commit it otherwise it won't add
-      return redirect('/schedule')#go to schedule after submit
+      return redirect('/users')#go to schedule after submit
     else:
       print("Invalid input(s)!")
 
@@ -243,7 +300,7 @@ def remove():
         toRM = User.query.filter_by(first_name = Name2Rm).first()
         db.session.delete(toRM)
         db.session.commit()
-        return redirect('/schedule')
+        return redirect('/users')
       else:
         print("User First Name Not Found")
     else:
@@ -268,13 +325,51 @@ def users():
 @app.route('/schedule')
 def schedule():
 
-  Suulistloc = Su1
-  Mulistloc = M1
-  Tulistloc = T1
-  Wulistloc = W1
-  Thulistloc = Th1
-  Fulistloc = F1
-  Sulistloc = S1
+  #stable = ScheduleTable(Sunday = Su1, Monday = M1, Tuesday = T1, Wednesday = W1, Thursday = Th1, Friday = F1, Saturday = S1)
+  Suulistloc = "empty"
+  Mulistloc = "empty"
+  Tulistloc = "empty"
+  Wulistloc = "empty"
+  Thulistloc = "empty"
+  Fulistloc = "empty"
+  Sulistloc = "empty"
+
+  try: Su1
+  except NameError: Suulistloc = None
+  if(Suulistloc != None):
+    Suulistloc = Su1
+  
+  try: M1
+  except NameError: Mulistloc = None
+  if(Mulistloc != None):
+    Mulistloc = M1
+  
+  try: T1
+  except NameError: Tulistloc = None
+  if(Tulistloc != None):
+    Tulistloc = T1
+  
+  try: W1
+  except NameError: Wulistloc = None
+  if(Wulistloc != None):
+    Wulistloc = W1
+
+  try: Th1
+  except NameError: Thulistloc = None
+  if(Thulistloc != None):
+    Thulistloc = Th1
+
+
+  try: F1
+  except NameError: Fulistloc = None
+  if(Fulistloc != None):
+    Fulistloc = F1
+
+
+  try: S1
+  except NameError: Sulistloc = None
+  if(Sulistloc != None):
+    Sulistloc = S1
 
   return render_template('schedule.html', Suulist = Suulistloc, 
                                          Mulist = Mulistloc, 
