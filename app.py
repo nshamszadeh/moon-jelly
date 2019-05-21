@@ -70,12 +70,6 @@ class ScheduleTable(Table):
 
 
 
-
-
-
-
-
-
 #create a log in page
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -94,19 +88,13 @@ def make():
   numuForm = NumberUsersForm()
 
   global number_usersM  # This is gross, gonna find a way to pass variables from one page to another later
-#number_usersM = None
   global number_usersT
-#number_usersT = None
   global number_usersW
-#number_usersW = None
   global number_usersTh
-#number_usersTh = None
   global number_usersF
-#number_usersF = None
   global number_usersS
-#number_usersS = None
   global number_usersSu
-#number_usersSu = None
+
 
   if request.method == 'POST':
     number_usersM = int(request.form['NumberUsersM']) # THIS DOESNT HANDLE EDGE CASES YET, BREAKS IF YOU INPUT A NUMBER, GONNA NEED TO FIX
@@ -123,30 +111,14 @@ def make():
 @app.route('/make2', methods=['GET', 'POST'])
 def make2():
 
-
   #global variables for making schedule
   global Su1 
-  #Su1 = None
   global M1
-  #M1 = None
   global T1 
-  #T1 = None
   global W1 
-  #W1 = None
   global Th1
-  #Th1 = None
   global F1 
-  #F1 = None
   global S1 
-  #S1 = None
-
-  #Su1 = None
-  #M1 = None
-  #T1 = None
-  #W1 = None
-  #Th1 = None
-  #F1 = None
-  #S1 = None
 
   
   Su1_1 = []
@@ -334,6 +306,51 @@ def schedule():
   Fulistloc = "empty"
   Sulistloc = "empty"
 
+  numberSuloc = 0
+  numberMloc = 0
+  numberTloc = 0
+  numberWloc = 0
+  numberThloc = 0
+  numberFloc = 0
+  numberSloc = 0
+  
+  try: number_usersSu
+  except NameError: numberSuloc = None
+  if(numberSuloc != None):
+    numberSuloc = number_usersSu
+  
+  try: number_usersM
+  except NameError: numberMloc = None
+  if(numberMloc != None):
+    numberMloc = number_usersM
+  
+  try: number_usersT
+  except NameError: numberTloc = None
+  if(numberTloc != None):
+    numberMToc = number_usersT
+  
+  try: number_usersW
+  except NameError: numberWloc = None
+  if(numberWloc != None):
+    numberWloc = number_usersW
+
+  try: number_usersTh
+  except NameError: numberThloc = None
+  if(numberThloc != None):
+    numberThloc = number_usersTh
+
+  try: number_usersF
+  except NameError: numberFloc = None
+  if(numberFloc != None):
+    numberFloc = number_usersF
+
+  try: number_usersS
+  except NameError: numberSloc = None
+  if(numberSloc != None):
+    numberSloc = number_usersS
+
+
+#dealing with gross global variables LIST NAMES
   try: Su1
   except NameError: Suulistloc = None
   if(Suulistloc != None):
@@ -370,6 +387,7 @@ def schedule():
   except NameError: Sulistloc = None
   if(Sulistloc != None):
     Sulistloc = S1
+
 
   return render_template('schedule.html', Suulist = Suulistloc, 
                                          Mulist = Mulistloc, 
