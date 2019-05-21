@@ -112,37 +112,7 @@ def remove():
   # add html file here
   return render_template('remove.html', delete_form = delete_form)
 
-"""
 
-from flask import Flask
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-app = Flask(__name__)
-app.config.from_object('config.DevelopmentConfig')
-db = SQLAlchemy(app)
-migrate=Migrate(app,db)
-# Create our database model
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
-
-    def __init__(self, email):
-        self.email = email
-
-    def __repr__(self):
-        return '<E-mail %r>' % self.email
-
-@app.route('/')
-def homepage():
-    the_time = datetime.now().strftime("%A, %d %b %Y %I:%M %p")
-
-# add html code here
-return 
-
-"""
 @app.route('/img/<path:path>')
 
 def send_js(path):
