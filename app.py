@@ -132,6 +132,7 @@ class UserTable(Table):
 # This is the main homepage for now. GET and POST are for web forms.
 @app.route('/add', methods = ['GET', 'POST'])
 def add():
+  return()
 
 @app.route('/')
 def homepage():
@@ -323,13 +324,13 @@ def make2():
 
   #global variables for making schedule
 
-  Su1_1 = []
-  M1_1 = []
-  T1_1 = []
-  W1_1 = []
-  Th1_1 = []
-  F1_1 = []
-  S1_1 = []
+  Su1 = []
+  M1= []
+  T1 = []
+  W1 = []
+  Th1 = []
+  F1 = []
+  S1 = []
 
 
   NU = Number_Users.query.all()
@@ -357,55 +358,55 @@ def make2():
     for entry in SchedForm.userfirstNamesSu.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Su1_1.append(U1.id)
+        Su1.append(U1.id)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesM.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        M1_1.append(U1.id)
+        M1.append(U1.id)
       else:
         print("not a valid first name")
     
     for entry in SchedForm.userfirstNamesT.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        T1_1.append(U1.id)
+        T1.append(U1.id)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesW.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        W1_1.append(U1.id)
+        W1.append(U1.id)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesTh.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Th1_1.append(U1.id)
+        Th1.append(U1.id)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesF.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        F1_1.append(U1.id)
+        F1.append(U1.id)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesS.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        S1_1.append(U1.id)
+        S1.append(U1.id)
       else:
         print("not a valid first name")
 
 
     if SchedForm.validate(): 
-      new_users_that_day = Users_That_Day(Su1_1, M1_1, T1_1, W1_1, Th1_1, F1_1, S1_1)
+      new_users_that_day = Users_That_Day(Su1, M1, T1, W1, Th1, F1, S1)
       db.session.add(new_users_that_day) # add to database
       db.session.commit()
       return(redirect('/schedule'))
@@ -418,17 +419,31 @@ def make2():
 @app.route('/schedule')
 @login_required
 def schedule():
-
+  
+  UTD_exists = "does it exist?"
   UTD = Users_That_Day.query.all()
-  Su1 = UTD[-1].Su1
-  M1 = UTD[-1].M1
-  T1 = UTD[-1].T1
-  W1 = UTD[-1].W1
-  Th1 = UTD[-1].Th1
-  F1 = UTD[-1].F1
-  S1 = UTD[-1].S1
+  print("UTD = ", UTD)
 
-  return render_template('schedule.html', Suulist = Su1, 
+  try: UTD
+  except NameError: UTD_exists = None
+
+  if(UTD_exists == None):
+    return render_template('schedule.html', Suulist = None, 
+                                         Mulist = None, 
+                                         Tulist = None, 
+                                         Wulist = None, 
+                                         Thulist = None, 
+                                         Fulist = None, 
+                                         Sulist = None)
+  else:
+    Su1 = UTD[-1].Su1
+    M1 = UTD[-1].M1
+    T1 = UTD[-1].T1
+    W1 = UTD[-1].W1
+    Th1 = UTD[-1].Th1
+    F1 = UTD[-1].F1
+    S1 = UTD[-1].S1
+    return render_template('schedule.html', Suulist = Su1, 
                                          Mulist = M1, 
                                          Tulist = T1, 
                                          Wulist = W1, 
