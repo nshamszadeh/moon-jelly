@@ -208,7 +208,7 @@ def schedule():
   u = User.query.all()
   utable = UserTable(u)
   #cardi = User.query.filter_by(specialty="cardiologist").all()
-  return render_template('schedule.html', users=u, utable=utable)
+  return render_template('schedule.html', users=u, utable=utable, nusers=len(u))
 
 #test to print out the first names of users 
 @app.route('/users')
