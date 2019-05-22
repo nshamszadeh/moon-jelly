@@ -143,7 +143,7 @@ def add():
     first_name = request.form['first_name'] 
     last_name = request.form['last_name']
     is_cardio = False
-    
+
     # if the inputs we're all validated by WTforms (improve validation later)
     if user_form.validate(): 
       # then store info in an initialized User object and store the object in the database
@@ -443,14 +443,10 @@ def make2():
 @login_required
 def schedule():
   
-  UTD_exists = "does it exist?"
   UTD = Users_That_Day.query.all()
   print("UTD = ", UTD)
 
-  try: UTD
-  except NameError: UTD_exists = None
-
-  if(UTD_exists == None):
+  if(UTD == []):
     return render_template('schedule.html', Suulist = None, 
                                          Mulist = None, 
                                          Tulist = None, 
