@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from forms import LoginForm, UserForm, DeleteForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
 from flask_table import Table, Col
+from sqlalchemy.dialects.postgresql import ARRAY
 
 # Some boilerplate setup stuff.
 
@@ -25,6 +26,8 @@ db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
 
 #number_users = 3
+
+
 
 # Create our database model. 
 class User(db.Model):
@@ -47,6 +50,92 @@ class User(db.Model):
     self.specialty = specialty
     self.initials = first_name[0] + last_name[0]
 
+
+class Number_Users(db.Model):
+
+  __tablename__ = "number_users_db"
+
+  
+  id = db.Column(db.Integer, primary_key=True)
+  number_usersSu = db.Column(db.Integer)
+  number_usersM = db.Column(db.Integer)
+  number_usersT = db.Column(db.Integer)
+  number_usersW = db.Column(db.Integer)
+  number_usersTh = db.Column(db.Integer)
+  number_usersF = db.Column(db.Integer)
+  number_usersS = db.Column(db.Integer)
+  #is_current = dbColumn(db.Boolean)
+
+  # initialize the object
+  def __init__(self, number_usersSu, number_usersM, number_usersT, number_usersW, number_usersTh, number_usersF, number_usersS):
+    self.number_usersSu = number_usersSu
+    self.number_usersM = number_usersM
+    self.number_usersT = number_usersT
+    self.number_usersW = number_usersW
+    self.number_usersTh = number_usersTh
+    self.number_usersF = number_usersF
+    self.number_usersS = number_usersS
+    #self.is_current = True
+
+class Users_That_Day(db.Model):
+
+  __tablename__ = "Users_That_Day_db"
+
+  
+  id = db.Column(db.Integer, primary_key=True)
+  Su1 = db.Column(ARRAY(db.Integer))
+  M1 = db.Column(ARRAY(db.Integer))
+  T1 = db.Column(ARRAY(db.Integer))
+  W1 = db.Column(ARRAY(db.Integer))
+  Th1 = db.Column(ARRAY(db.Integer))
+  F1 = db.Column(ARRAY(db.Integer))
+  S1 = db.Column(ARRAY(db.Integer))
+  #is_current = dbColumn(db.Boolean)
+
+  # initialize the object
+  def __init__(self, Su1, M1, T1, W1, Th1, F1, S1):
+    self.Su1 = Su1
+    self.M1 = M1
+    self.T1 = T1
+    self.W1 = W1
+    self.Th1 = Th1
+    self.F1 = F1
+    self.S1 = S1
+    #self.is_current = True
+
+class Day(db.Model):
+
+  __tablename__ = "Days" ##what does this do?
+
+  # Each day of sechedule will have all these things
+  id = db.Column(db.Integer, primary_key=True)
+
+  first_AM = db.Column(db.Integer)
+  first_PM = db.Column(db.Integer)
+  second = db.Column(db.Integer)
+  third = db.Column(db.Integer)
+  fourth = db.Column(db.Integer)
+  fith = db.Column(db.Integer)
+  sixth = db.Column(db.Integer)
+  seventh = db.Column(db.Integer)
+  PostCall = db.Column(db.Integer)
+  Is_Weekend = db.Column(db.Boolean)
+
+
+  # initialize the object
+  def __init__(self, first_AM, first_PM, second, third, fourth, fith, sixth, seventh, PostCall):
+    self.first_AM = first_AM
+    self.first_PM = first_PM
+    self.second = second
+    self.third = third
+    self.fourth = fourth
+    self.fith = fith
+    self.sixth = sixth
+    self.seventh = seventh
+    self.PostCall = PostCall
+
+
+
 class UserTable(Table):
     id = Col('id')
     first_name = Col('First Name')
@@ -54,20 +143,6 @@ class UserTable(Table):
     specialty = Col('Specialty')
     email = Col('Email')
     initials = Col('initials')
-
-class ScheduleTable(Table):
-    
-    Sunday = Col('Sun')
-    Monday = Col('Mon')
-    Tuesday = Col('Tues')
-    Wednesday = Col('Weds')
-    Thursday = Col('Thrus')
-    Friday = Col("Fri")
-    Saturday = Col("Sat")
-
-    #def __init__(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday):
-
-
 
 
 #create a log in page
@@ -85,26 +160,45 @@ def login():
 
 @app.route('/make', methods=['GET', 'POST'])
 def make():
-  numuForm = NumberUsersForm()
 
-  global number_usersM  # This is gross, gonna find a way to pass variables from one page to another later
-  global number_usersT
-  global number_usersW
-  global number_usersTh
-  global number_usersF
-  global number_usersS
-  global number_usersSu
+  numuForm = NumberUsersForm()
 
 
   if request.method == 'POST':
-    number_usersM = int(request.form['NumberUsersM']) # THIS DOESNT HANDLE EDGE CASES YET, BREAKS IF YOU INPUT A NUMBER, GONNA NEED TO FIX
-    number_usersT = int(request.form['NumberUsersT'])
-    number_usersW = int(request.form['NumberUsersW'])
-    number_usersTh = int(request.form['NumberUsersTh'])
-    number_usersF = int(request.form['NumberUsersF'])
-    number_usersS = int(request.form['NumberUsersS'])
-    number_usersSu = int(request.form['NumberUsersSu'])
-    if numuForm.validate():
+
+    if(request.form['NumberUsersM'].isdigit()):
+      number_usersM = int(request.form['NumberUsersM'])
+
+    if(request.form['NumberUsersT'].isdigit()):
+      number_usersT = int(request.form['NumberUsersT'])
+    
+    if(request.form['NumberUsersW'].isdigit()):
+     number_usersW = int(request.form['NumberUsersW'])
+    
+    if(request.form['NumberUsersTh'].isdigit()):
+     number_usersTh = int(request.form['NumberUsersTh'])
+    
+    if(request.form['NumberUsersF'].isdigit()):
+      number_usersF = int(request.form['NumberUsersF'])
+    
+    if(request.form['NumberUsersS'].isdigit()):
+     number_usersS = int(request.form['NumberUsersS'])
+    
+    if(request.form['NumberUsersSu'].isdigit()):
+      number_usersSu = int(request.form['NumberUsersSu'])
+   
+
+    if numuForm.validate(): 
+      new_number_users = Number_Users(number_usersSu, 
+                                      number_usersM, 
+                                      number_usersT, 
+                                      number_usersW, 
+                                      number_usersTh, 
+                                      number_usersF, 
+                                      number_usersS)
+      db.session.add(new_number_users)
+      db.session.commit()
+
       return redirect('/make2')
   return render_template('make.html', numuForm = numuForm)
 
@@ -112,15 +206,7 @@ def make():
 def make2():
 
   #global variables for making schedule
-  global Su1 
-  global M1
-  global T1 
-  global W1 
-  global Th1
-  global F1 
-  global S1 
 
-  
   Su1_1 = []
   M1_1 = []
   T1_1 = []
@@ -129,21 +215,24 @@ def make2():
   F1_1 = []
   S1_1 = []
 
-  userfirstNamesSu = ["first_name"]*number_usersSu
-  userfirstNamesM = ["first_name"]*number_usersM
-  userfirstNamesT = ["first_name"]*number_usersT
-  userfirstNamesW = ["first_name"]*number_usersW
-  userfirstNamesTh = ["first_name"]*number_usersTh
-  userfirstNamesF = ["first_name"]*number_usersF
-  userfirstNamesS = ["first_name"]*number_usersS
+
+  NU = Number_Users.query.all()
+
+  userfirstNamesSu = ["first_name"]*NU[-1].number_usersSu
+  userfirstNamesM = ["first_name"]*NU[-1].number_usersM
+  userfirstNamesT = ["first_name"]*NU[-1].number_usersT
+  userfirstNamesW = ["first_name"]*NU[-1].number_usersW
+  userfirstNamesTh = ["first_name"]*NU[-1].number_usersTh
+  userfirstNamesF = ["first_name"]*NU[-1].number_usersF
+  userfirstNamesS = ["first_name"]*NU[-1].number_usersS
   SchedForm = ScheduleForm(request.form,
+                           userfirstNamesSu=userfirstNamesSu,
                            userfirstNamesM=userfirstNamesM,
                            userfirstNamesT=userfirstNamesT,
                            userfirstNamesW=userfirstNamesW,
                            userfirstNamesTh=userfirstNamesTh,
                            userfirstNamesF=userfirstNamesF,
-                           userfirstNamesS=userfirstNamesS,
-                           userfirstNamesSu=userfirstNamesSu)
+                           userfirstNamesS=userfirstNamesS)
   
 
 
@@ -151,62 +240,58 @@ def make2():
     
     for entry in SchedForm.userfirstNamesSu.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        Su1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Su1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    Su1 = Su1_1
 
     for entry in SchedForm.userfirstNamesM.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        M1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        M1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    M1 = M1_1
     
     for entry in SchedForm.userfirstNamesT.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        T1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        T1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    T1 = T1_1
 
     for entry in SchedForm.userfirstNamesW.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        W1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        W1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    W1 = W1_1
 
     for entry in SchedForm.userfirstNamesTh.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        Th1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Th1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    Th1 = Th1_1
 
     for entry in SchedForm.userfirstNamesF.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        F1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        F1_1.append(U1.id)
       else:
         print("not a valid first name")
-
-    F1 = F1_1
 
     for entry in SchedForm.userfirstNamesS.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        S1_1.append(User.query.filter_by(first_name=entry.data.get("first_name")).first())
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        S1_1.append(U1.id)
       else:
         print("not a valid first name")
 
-    S1 = S1_1
-
 
     if SchedForm.validate(): 
+      new_users_that_day = Users_That_Day(Su1_1, M1_1, T1_1, W1_1, Th1_1, F1_1, S1_1)
+      db.session.add(new_users_that_day) # add to database
+      db.session.commit()
       return(redirect('/schedule'))
   
   print("SchedForm.errors = ", SchedForm.errors)
@@ -297,105 +382,40 @@ def users():
 @app.route('/schedule')
 def schedule():
 
-  #stable = ScheduleTable(Sunday = Su1, Monday = M1, Tuesday = T1, Wednesday = W1, Thursday = Th1, Friday = F1, Saturday = S1)
-  Suulistloc = "empty"
-  Mulistloc = "empty"
-  Tulistloc = "empty"
-  Wulistloc = "empty"
-  Thulistloc = "empty"
-  Fulistloc = "empty"
-  Sulistloc = "empty"
+  UTD = Users_That_Day.query.all()
+  Su1 = UTD[-1].Su1
+  M1 = UTD[-1].M1
+  T1 = UTD[-1].T1
+  W1 = UTD[-1].W1
+  Th1 = UTD[-1].Th1
+  F1 = UTD[-1].F1
+  S1 = UTD[-1].S1
 
-  numberSuloc = 0
-  numberMloc = 0
-  numberTloc = 0
-  numberWloc = 0
-  numberThloc = 0
-  numberFloc = 0
-  numberSloc = 0
-  
-  try: number_usersSu
-  except NameError: numberSuloc = None
-  if(numberSuloc != None):
-    numberSuloc = number_usersSu
-  
-  try: number_usersM
-  except NameError: numberMloc = None
-  if(numberMloc != None):
-    numberMloc = number_usersM
-  
-  try: number_usersT
-  except NameError: numberTloc = None
-  if(numberTloc != None):
-    numberMToc = number_usersT
-  
-  try: number_usersW
-  except NameError: numberWloc = None
-  if(numberWloc != None):
-    numberWloc = number_usersW
+  return render_template('schedule.html', Suulist = Su1, 
+                                         Mulist = M1, 
+                                         Tulist = T1, 
+                                         Wulist = W1, 
+                                         Thulist = Th1, 
+                                         Fulist = F1, 
+                                         Sulist = S1)
 
-  try: number_usersTh
-  except NameError: numberThloc = None
-  if(numberThloc != None):
-    numberThloc = number_usersTh
+def sorter(Su1, M1, T1, W1, Th1, F1, S1):
+  print("<User1> type = ", type(Su1[0]))
+  print("<User1> name = ", Su1[0].first_name)
 
-  try: number_usersF
-  except NameError: numberFloc = None
-  if(numberFloc != None):
-    numberFloc = number_usersF
+  #if(Su1[0] != User.query.filter_by(first_name="Test1").first()):
+    #print("Su1 first shouldnt be Test1")
+  print("Su1 = ", Su1)
+  print("M1 = ", M1)
+  print("T1 = ", T1)
+  print("W1 = ", W1)
+  print("Th1 = ", Th1)
+  print("F1 = ", F1)
+  print("S1 = ", S1)
 
-  try: number_usersS
-  except NameError: numberSloc = None
-  if(numberSloc != None):
-    numberSloc = number_usersS
+  return()
 
 
-#dealing with gross global variables LIST NAMES
-  try: Su1
-  except NameError: Suulistloc = None
-  if(Suulistloc != None):
-    Suulistloc = Su1
-  
-  try: M1
-  except NameError: Mulistloc = None
-  if(Mulistloc != None):
-    Mulistloc = M1
-  
-  try: T1
-  except NameError: Tulistloc = None
-  if(Tulistloc != None):
-    Tulistloc = T1
-  
-  try: W1
-  except NameError: Wulistloc = None
-  if(Wulistloc != None):
-    Wulistloc = W1
-
-  try: Th1
-  except NameError: Thulistloc = None
-  if(Thulistloc != None):
-    Thulistloc = Th1
-
-
-  try: F1
-  except NameError: Fulistloc = None
-  if(Fulistloc != None):
-    Fulistloc = F1
-
-
-  try: S1
-  except NameError: Sulistloc = None
-  if(Sulistloc != None):
-    Sulistloc = S1
-
-
-  return render_template('schedule.html', Suulist = Suulistloc, 
-                                         Mulist = Mulistloc, 
-                                         Tulist = Tulistloc, 
-                                         Wulist = Wulistloc, 
-                                         Thulist = Thulistloc, 
-                                         Fulist = Fulistloc, 
-                                         Sulist = Sulistloc)
 
 #return render_template('home.html', form = user_form)
 
