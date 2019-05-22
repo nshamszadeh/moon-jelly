@@ -109,15 +109,6 @@ class Users_That_Day(db.Model):
     self.S1 = S1
     #self.is_current = True
 
-# this is used to save login states for each user
-@login_manager.user_loader
-def load_user(user_id):
-  return User.query.get(int(user_id))
-
-# wtf does this do
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxA(0, text, title, style)
-
 # database table
 class UserTable(Table):
     id = Col('id')
@@ -129,10 +120,40 @@ class UserTable(Table):
     is_cardio = Col('Cardiologist?')
     password = Col('Password')
 
+# this is used to save login states for each user
+@login_manager.user_loader
+def load_user(user_id):
+  return User.query.get(int(user_id))
+
+# wtf does this do
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxA(0, text, title, style)
+
 # This is the main homepage for now. GET and POST are for web forms.
 @app.route('/add', methods = ['GET', 'POST'])
-def add():
-  return()
+def add(): 
+  # define a form object
+  user_form = UserForm()
+
+  # if we are posting a form, i.e. submitting a form, store all the info in these variables
+  if request.method == 'POST':
+    email = request.form['email']
+    first_name = request.form['first_name'] 
+    last_name = request.form['last_name']
+    is_cardio = False
+    
+    # if the inputs we're all validated by WTforms (improve validation later)
+    if user_form.validate(): 
+      # then store info in an initialized User object and store the object in the database
+      new_user = User(email, first_name, last_name, is_admin = False, is_cardio = is_cardio, password = "abc" )
+      db.session.add(new_user) # add to database
+      db.session.commit() # for some reason we also need to commit it otherwise it won't add
+      return redirect('/users')#go to schedule after submit
+    else:
+      print("Invalid input(s)!")
+
+  # add html file here
+  return render_template('add.html', form = user_form)
 
 @app.route('/')
 def homepage():
