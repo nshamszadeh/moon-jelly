@@ -174,7 +174,9 @@ def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
 # This is the main homepage for now. GET and POST are for web forms.
+
 @app.route('/add', methods = ['GET', 'POST'])
+
 def add(): 
   # define a form object
   user_form = UserForm()
@@ -325,21 +327,6 @@ def users():
   return render_template('users.html', utable=utable)
 
   #create a schedule page
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/make', methods=['GET', 'POST'])
 def make():
 
