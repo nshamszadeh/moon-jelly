@@ -130,8 +130,8 @@ class UserTable(Table):
     password = Col('Password')
 
 # This is the main homepage for now. GET and POST are for web forms.
-@app.route('/add', methods = ['GET', 'POST'])
-def add():
+#@app.route('/add', methods = ['GET', 'POST'])
+#def add():
 
 @app.route('/')
 def homepage():
