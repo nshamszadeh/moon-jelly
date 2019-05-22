@@ -19,9 +19,13 @@ class UserForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name', [validators.DataRequired(message = 'Please Enter Something')])
 	email = StringField('Email', [validators.Email(message = 'Please Enter A Valid Email')])
-	is_cardio = BooleanField('Cardiologist?')
+	is_cardio = SelectField('Cardiologist?', choices=[('True', 'Yes'), ('False', 'No')])	
+	is_admin = SelectField('Administrator? (can add/remove users)', choices=[('False', 'No'), ('True', 'Yes')])
 
 class DeleteForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name')
 	email = StringField('Email')
+
+class SetPasswordForm(FlaskForm):
+	

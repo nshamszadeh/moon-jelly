@@ -1,5 +1,6 @@
 import os
 import subprocess
+from flask_mail import Mail
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,20 +10,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
-
-# URL should be whatever database URL is being used (if testing on your own use a database different from the team's )
+mail = Mail(app)
                            
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ricculxqdypnfh:d8283cc0c6d1c05d5874a972d5176b29c24751188711916086c6e4537f035274@ec2-23-21-136-232.compute-1.amazonaws.com:5432/dfuo44q4pq80o6'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
-# w
 
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
@@ -73,7 +70,7 @@ class UserTable(Table):
     last_name = Col('Last Name')
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
-    initial = Col('Initials')
+    initials = Col('Initials')
     password = Col('Password')
 
 @app.route('/')
@@ -153,6 +150,40 @@ def register():
       
   # add html file here
   return render_template('register.html', form = register_form)
+
+
+@app.route('/add', methods = ['GET', 'POST'])
+@login_required
+def add():
+  if current_user.is_admin == None:
+    return redirect(url_for('homepage'))
+  else:
+    # define a form object
+    user_form = UserForm()
+
+  if request.method == 'POST': # for some reason request.method is 'GET' now??
+    first_name = request.form['first_name'] 
+    last_name = request.form['last_name']
+    email = request.form['email']
+    is_cardio = request.form['is_cardio']
+    
+    # if the inputs we're all validated by WTforms (improve validation later)
+    if user_form.validate(): 
+      if is_cardio == 'True':
+        is_cardio = True
+      else:
+        is_cardio = False
+      new_user = User(email, first_name, last_name, False, is_cardio, 'lolwat')
+      db.session.add(new_user) # add to database
+      db.session.commit() # for some reason we also need to commit it otherwise it won't add
+      return redirect(url_for('homepage')) # go to homepage again 
+    else:
+      print("Invalid input(s)!")
+  else:
+    print(request.method)
+  return render_template('add.html', form = user_form)
+
+
 
 
 @app.route('/remove', methods = ['GET', 'POST'])
