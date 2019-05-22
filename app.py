@@ -283,21 +283,6 @@ def users():
   return render_template('users.html', utable=utable)
 
   #create a schedule page
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/make', methods=['GET', 'POST'])
 def make():
 
