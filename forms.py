@@ -28,4 +28,4 @@ class DeleteForm(FlaskForm):
 	email = StringField('Email')
 
 class SetPasswordForm(FlaskForm):
-	
+	password = PasswordField('Password', [validators.DataRequired(message = 'Please Enter Something')])
