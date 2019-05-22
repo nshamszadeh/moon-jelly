@@ -1,139 +1,29 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div id="schedule">
-<div class="container-fluid padding">
-<div class="row welcome text-center">
-  <div class="col-12">
-    <h1 class="display-7">Schedule for Dumbdumb#1</h1>
-  </div>
-</div>
-</div>
-<!-- first row -->
-<div class="row">
-  <div class="col">
-    Pos\Day
-  </div>
-  <div class="col">
-    Monday
-  </div>
-  <div class="col">
-    Tuesday
-  </div>
-  <div class="col">
-    Wednesday
-  </div>
-  <div class="col">
-    Thursday
-  </div>
-  <div class="col">
-    Friday
-  </div>
-  <div class="col">
-    Saturday
-  </div>
-  <div class="col">
-    Sunday
-  </div>
-</div>
 
-{%for i in range(0,5)%}
-<div class="row">
-  <div class="col">
-    Pos#{{i}}
-  </div>
-  {%for j in range(0,7)%}
-    <div class="col">
-      {{users[i%nusers].first_name}}
-    </div>
-  {%endfor%}
-</div>
-{%endfor%}
-</div>
+<table style="width:100%">
+
+  <tr>
+    <th>Mon</th>
+    <th>Tue</th> 
+    <th>Wed</th>
+    <th>Thu</th>
+    <th>Fri</th>
+    <th>Sat</th>
+    <th>Sun</th>
+  </tr>
+
+<tr>
+    <th>{{Mulist}}</th>
+    <th>{{Tulist}}</th> 
+    <th>{{Wulist}}</th>
+    <th>{{Thulist}}</th>
+    <th>{{Fulist}}</th>
+    <th>{{Sulist}}</th>
+    <th>{{Suulist}}</th>
+  </tr>
+
+</table> 
+    
 {% endblock %}
-
-
-<!-- first row 
-<div class="row">
-  <div class="col">
-    Pos\Day
-  </div>
-  <div class="col">
-    Monday
-  </div>
-  <div class="col">
-    Tuesday
-  </div>
-  <div class="col">
-    Wednesday
-  </div>
-  <div class="col">
-    Thursday
-  </div>
-  <div class="col">
-    Friday
-  </div>
-  <div class="col">
-    Saturday
-  </div>
-  <div class="col">
-    Sunday
-  </div>
-</div>
-
-<div class="row">
-  <div class="col">
-    Pos#{i}
-  </div>
-  <div class="col">
-    {% for user in users %}
-    <th>{{user.first_name}}</th>
-    {% endfor %}
-  </div>
-  <div class="col">
-
-  </div>
-  <div class="col">
-
-  </div>
-  <div class="col">
-
-  </div>
-  <div class="col">
-
-  </div>
-  <div class="col">
-
-  </div>
-  <div class="col">
-
-  </div>
-</div>
-
-{% for user in users %}
-  <tr>
-	    <td>{{ user.id }} - {{ user.first_name }} - {{ user.specialty}} </td>
-  </tr>
-{% endfor %}
--->
-
-
- <!--  <tr>
-    <td></td>
-    <td>Smith</td> 
-    <td>50</td>
-  </tr>
-
-  <tr>
-    <td>Eve</td>
-    <td>Jackson</td> 
-    <td>94</td>
-  </tr>
-
-  <tr>
-    <td>Alice</td>
-    <td>Jackson</td> 
-    <td>94</td>
-  </tr>
- -->
-
