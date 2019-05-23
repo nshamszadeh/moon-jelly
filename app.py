@@ -266,6 +266,11 @@ def send_js(path):
 def about():
   return render_template('about.html')
 
+@app.route('/profile')
+@login_required
+def profile():
+  return render_template('profile.html')
+
 @app.route('/contact')
 def contact():
   try:
@@ -471,16 +476,13 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
 
   return()
 
-
-
-#return render_template('home.html', form = user_form)
-
-
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('homepage'))
+
+
 
 if __name__ == '__main__':
   app.run(debug=True, use_reloader=True)

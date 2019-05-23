@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+   <h1>Welcome! {{current_user.first_name}} {{current_user.last_name}}</h1> 
+   <h5>Email</h5>
+   <h5>{{current_user.email}}</h5>
+          <form action="" method="POST">
+	   		{% for field in delete_form  %}
+	   		<p>
+	   			{{field.label}}
+	   			{{field}}
+	   		</p>
+	   		{% endfor %}
+	   		<button>
+	   			Edit Email
+	   		</button>
+		</form>
+   <h3>Password: {{current_user.password}}</h3>
+
+       <form action="" method="POST">
+	   		{% for field in delete_form  %}
+	   		<p>
+	   			{{field.label}}
+	   			{{field}}
+	   		</p>
+	   		{% endfor %}
+	   		<button>
+	   			Edit Password
+	   		</button>
+		</form>
+
+		       <form action="" method="POST">
+	   		{% for field in delete_form  %}
+	   		<p>
+	   			{{field.label}}
+	   			{{field}}
+	   		</p>
+	   		{% endfor %}
+	   		<button>
+	   			Delete Profile
+	   		</button>
+		</form>
+
+{% endblock %}
