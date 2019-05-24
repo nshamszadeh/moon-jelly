@@ -1,13 +1,13 @@
 import os
 import subprocess
-from itsdangerous import JSONWebSignatureSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm
 
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
@@ -182,7 +182,7 @@ def send_password_email(user):
                   sender='moonjelly323@gmail.com',
                   recipients=[user.email])
     msg.body = f'''To set your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
+{url_for('set_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
     mail.send(msg)
@@ -238,20 +238,21 @@ def add():
 
 @app.route("/set_password/<token>", methods=['GET', 'POST'])
 def set_token(token):
-    if current_user.is_authenticated:
-      return redirect(url_for('logged_in_homepage'))
-    user = User.verify_reset_token(token)
-    if user is None:
-      flash('That is an invalid or expired token', 'warning')
-      return redirect(url_for('homepage'))
-    form = SetPasswordForm()
-    if form.validate_on_submit():
-      hashed_password = generate_password_hash(password, method = 'sha256') 
-      user.password = hashed_password
-      db.session.commit()
-      flash('Your password has been updated! You are now able to log in', 'success')
-      return redirect(url_for('login'))
-return render_template('reset_token.html', title='Reset Password', form=form)
+  if current_user.is_authenticated:
+    return redirect(url_for('logged_in_homepage'))
+  user = User.verify_reset_token(token)
+  if user is None:
+    flash('That is an invalid or expired token', 'warning')
+    return redirect(url_for('homepage'))
+  form = SetPasswordForm()
+  if form.validate():
+    password = request.form['password']
+    hashed_password = generate_password_hash(password, method = 'sha256') 
+    user.password = hashed_password
+    db.session.commit()
+    flash('Your password has been updated! You are now able to log in', 'success')
+    return redirect(url_for('login'))
+  return render_template('set_password.html', form=form)
 
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
