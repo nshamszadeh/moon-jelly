@@ -11,11 +11,13 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-# import StringIO
+
+#import StringIO
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
-# import flask_excel as excel
+#import flask_excel as excel
+
 import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
 
@@ -29,7 +31,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER'''
 
 
-#pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')  
+pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')  
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -249,7 +251,7 @@ def add():
   # add html file here
   return render_template('add.html', form = user_form)
 
-'''
+
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -276,8 +278,6 @@ def view_invoice(business_name, tin):
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
-
-'''
 
 @app.route('/')
 def homepage():
