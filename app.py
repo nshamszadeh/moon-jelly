@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-#import StringIO
+import StringIO
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -29,7 +29,9 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER'''
 
 
-pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')  
+
+#pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
+
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -269,7 +271,7 @@ def view_invoice(business_name, tin):
 
     #pdf = StringIO()
     html = render_template(
-        'add.html', business_name=business_name, tin=tin)
+        'schedule.html', business_name=business_name, tin=tin)
     file_class = Pdf()
     pdf = file_class.render_pdf(business_name, html)
     headers = {
