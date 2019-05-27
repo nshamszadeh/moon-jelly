@@ -29,7 +29,9 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER'''
 
 
+
 #pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
+
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
