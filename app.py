@@ -11,11 +11,23 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import StringIO
+import csv
+from flask import Flask, make_response, render_template
+from flask import Flask, request, jsonify
+import flask_excel as excel
+import pdfkit 
+from flask import Flask, flash, request, redirect, url_for
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'C:/Users/jenny/Desktop/moon-jelly/img'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# URL should be whatever database URL is being used (if testing on your own use a database different from the team's )
-                           
+
+pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')                         
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -26,7 +38,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
-# w
 
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
@@ -185,6 +196,7 @@ class UserTable(Table):
     is_cardio = Col('Cardiologist?')
     password = Col('Password')
 
+
 # this is used to save login states for each user
 @login_manager.user_loader
 def load_user(user_id):
@@ -194,7 +206,19 @@ def load_user(user_id):
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
-# This is the main homepage for now. GET and POST are for web forms.
+# This is the main homepage for now. GET and POST are for web forms
+'''
+@app.route('/<name>/<location>')
+def pdf_template(name,location):
+  rendered=render_template('pdf_template.html',name=name,location=location)
+  pdf=pdfkit.from_string(rendered,False)
+
+  response=make_response(pdf)
+  respons.headers['Content-Type']='application/pdf'
+  response.headers['Content-Disposition']='inline; filename=output.pdf'
+
+  return response
+'''
 
 @app.route('/add', methods = ['GET', 'POST'])
 
@@ -221,6 +245,34 @@ def add():
 
   # add html file here
   return render_template('add.html', form = user_form)
+
+class Pdf():
+
+    def render_pdf(self, name, html):
+
+        from xhtml2pdf import pisa
+        from StringIO import StringIO
+
+        pdf = StringIO()
+
+        pisa.CreatePDF(StringIO(html), pdf)
+
+        return pdf.getvalue()
+
+
+@app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
+def view_invoice(business_name, tin):
+
+    #pdf = StringIO()
+    html = render_template(
+        'add.html', business_name=business_name, tin=tin)
+    file_class = Pdf()
+    pdf = file_class.render_pdf(business_name, html)
+    headers = {
+        'content-type': 'application.pdf',
+        'content-disposition': 'attachment; filename=certificate.pdf'}
+    return pdf, 200, headers
+
 
 @app.route('/')
 def homepage():
@@ -322,19 +374,32 @@ def remove():
 
   return render_template('remove.html', delete_form = delete_form)
 
-
 @app.route('/img/<path:path>')
 def send_js(path):
     return send_from_directory('img', path)
 
 @app.route('/about')
 def about():
-  return render_template('about.html')
+  try:
+    message = subprocess.check_output(['hi'], shell=True)
+  except:
+    message = "Sorry, we coundn't run that command..."
+  #dir:command you want to run(name)
+  return render_template('about.html', message=message)
 
+#upload photos 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+          
 @app.route('/profile')
 @login_required
 def profile():
   return render_template('profile.html')
+
+@app.route('/Jenny')
+def Jenny():
+  return render_template('Jenny.html')
 
 @app.route('/contact')
 def contact():
