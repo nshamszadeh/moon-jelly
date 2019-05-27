@@ -24,7 +24,9 @@ from flask_table import Table, Col
 app = Flask(__name__)
 
 
+
 #pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
+
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
