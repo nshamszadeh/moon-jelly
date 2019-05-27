@@ -660,8 +660,6 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
-pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
-
 
 if __name__ == '__main__':
   app.run(debug=True, use_reloader=True)
