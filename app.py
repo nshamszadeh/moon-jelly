@@ -18,15 +18,10 @@ from flask import Flask, request, jsonify
 #import flask_excel as excel
 import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
+from flask_table import Table, Col 
 
 
-'''UPLOAD_FOLDER = 'C:/Users/jenny/Desktop/moon-jelly/img'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-'''
 app = Flask(__name__)
-
-'''
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER'''
 
 
 #pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
@@ -190,15 +185,14 @@ class Day(db.Model):
 
 # database table
 class UserTable(Table):
-    id = Col('id')
+    id = Col('Id')
     email = Col('Email')
     first_name = Col('First Name')
     last_name = Col('Last Name')
     initials = Col('initials')
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
-    password = Col('Password')
-
+    password = Col('Password',show=False)
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -276,6 +270,7 @@ def view_invoice(business_name, tin):
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
+
 
 @app.route('/')
 def homepage():
@@ -390,12 +385,7 @@ def about():
   #dir:command you want to run(name)
   return render_template('about.html', message=message)
 
-#upload photos 
-'''
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-'''
+
 
 @app.route('/profile')
 @login_required
