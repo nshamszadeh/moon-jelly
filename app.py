@@ -230,7 +230,7 @@ def load_user(user_id):
 # wtf does this do
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
-
+'''
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -244,7 +244,7 @@ class Pdf():
 
         return pdf.getvalue()
 
-'''
+
 @app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
 def view_invoice(business_name, tin):
 
@@ -257,7 +257,7 @@ def view_invoice(business_name, tin):
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
-
+'''
 
 @app.route('/')
 def homepage():
@@ -268,7 +268,6 @@ def homepage():
       return render_template('home2.html') # else link the login page (admins add users)
     else:
       return redirect(url_for('logged_in_homepage'))
-'''
 
 @app.route('/logged_in_homepage')
 @login_required
@@ -337,18 +336,21 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
-
+'''
 def send_password_email(user):
     token = user.get_reset_token()
     msg = Message('Set ur goddamn Password here',
                   sender='moonjelly323@gmail.com',
                   recipients=[user.email])
-    msg.body = f'''To set your password, visit the following link:
+    msg.body = f'''
+
+'''To set your password, visit the following link:
 {url_for('set_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
+'''
     mail.send(msg)
-
+'''
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
 def add():
