@@ -33,7 +33,7 @@ app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ricculxqdypnfh:d8283cc0c6d1c05d5874a972d5176b29c24751188711916086c6e4537f035274@ec2-23-21-136-232.compute-1.amazonaws.com:5432/dfuo44q4pq80o6'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ricculxqdypnfh:d8283cc0c6d1c05d5874a972d5176b29c24751188711916086c6e4537f035274@ec2-23-21-136-232.compute-1.amazonaws.com:5432/dfuo44q4pq80o6'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
@@ -245,7 +245,7 @@ def add():
   # add html file here
   return render_template('add.html', form = user_form)
 
-
+'''
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -259,7 +259,7 @@ class Pdf():
 
         return pdf.getvalue()
 
-'''
+
 @app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
 def view_invoice(business_name, tin):
 
@@ -273,6 +273,7 @@ def view_invoice(business_name, tin):
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
 
+'''
 
 @app.route('/')
 def homepage():
@@ -283,7 +284,7 @@ def homepage():
       return render_template('home2.html') # else link the login page (admins add users)
     else:
       return redirect(url_for('logged_in_homepage'))
-'''
+
 
 @app.route('/logged_in_homepage')
 @login_required
