@@ -2,7 +2,58 @@
 
 {% block body %}
 
-<table style="width:100%">
+<div id="schedule">
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+    <h1 class="display-7">Schedule for Dumbdumb#1</h1>
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col">
+    Pos\Day
+  </div>
+  <div class="col">
+    Monday
+  </div>
+  <div class="col">
+    Tuesday
+  </div>
+  <div class="col">
+    Wednesday
+  </div>
+  <div class="col">
+    Thursday
+  </div>
+  <div class="col">
+    Friday
+  </div>
+  <div class="col">
+    Saturday
+  </div>
+  <div class="col">
+    Sunday
+  </div>
+</div>
+
+{%for row in matrix%}
+<div class="row">
+  <div class="col">
+    Pos#N
+  </div>
+  {%for slot in row%}
+    <div class="col">
+      {{slot.doctor.first_name}}
+    </div>
+  {%endfor%}
+</div>
+{%endfor%}
+
+</div>
+
+<!-- <table style="width:100%">
 
   <tr>
     <th>Mon</th>
@@ -24,6 +75,6 @@
     <th>{{Suulist}}</th>
   </tr>
 
-</table> 
+</table>  -->
     
 {% endblock %}
