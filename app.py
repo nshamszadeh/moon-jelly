@@ -1,14 +1,15 @@
 import os
 import subprocess
-from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
-from flask_table import Table, Col
+import csv
+import pdfkit 
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from werkzeug.security import generate_password_hash, check_password_hash
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 #import StringIO
@@ -19,26 +20,35 @@ from flask import Flask, request, jsonify
 import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
-
+from flask_mail import Mail, Message
+from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_table import Table, Col
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
 
-
-
+# youve got mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+          
 #pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
-
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ricculxqdypnfh:d8283cc0c6d1c05d5874a972d5176b29c24751188711916086c6e4537f035274@ec2-23-21-136-232.compute-1.amazonaws.com:5432/dfuo44q4pq80o6'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
 
+mail = Mail(app)
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
 
@@ -78,6 +88,20 @@ class User(UserMixin, db.Model):
   #first_AM = db.Column(db.Integer)
   
 
+  # some uh methods for things and stuff 
+  def get_reset_token(self, expires_sec=1800):
+    s = Serializer(app.config['SECRET_KEY'], expires_sec)
+    return s.dumps({'user_id': self.id}).decode('utf-8')
+
+  @staticmethod
+  def verify_reset_token(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+      user_id = s.loads(token)['user_id']
+    except:
+      return None
+    return User.query.get(user_id)
+
   # initialize the object
   def __init__(self, email, first_name, last_name, is_admin, is_cardio, password):
     self.email = email
@@ -86,6 +110,7 @@ class User(UserMixin, db.Model):
     self.is_admin = is_admin
     self.is_cardio = is_cardio
     self.password = password 
+
     # self.firstam = firstam
     # self.firstpm = firstpm
     # self.second = second
@@ -95,6 +120,7 @@ class User(UserMixin, db.Model):
     # self.sixth = sixth
     # self.seventh = seventh
     # self.postcall = postcall
+
     self.initials = first_name[0] + last_name[0]
 
 class Number_Users(db.Model):
@@ -205,47 +231,6 @@ def load_user(user_id):
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
-# This is the main homepage for now. GET and POST are for web forms
-'''
-@app.route('/<name>/<location>')
-def pdf_template(name,location):
-  rendered=render_template('pdf_template.html',name=name,location=location)
-  pdf=pdfkit.from_string(rendered,False)
-
-  response=make_response(pdf)
-  respons.headers['Content-Type']='application/pdf'
-  response.headers['Content-Disposition']='inline; filename=output.pdf'
-
-  return response
-'''
-
-@app.route('/add', methods = ['GET', 'POST'])
-
-def add(): 
-  # define a form object
-  user_form = UserForm()
-
-  # if we are posting a form, i.e. submitting a form, store all the info in these variables
-  if request.method == 'POST':
-    email = request.form['email']
-    first_name = request.form['first_name'] 
-    last_name = request.form['last_name']
-    is_cardio = False
-
-    # if the inputs we're all validated by WTforms (improve validation later)
-    if user_form.validate(): 
-      # then store info in an initialized User object and store the object in the database
-      new_user = User(email, first_name, last_name, is_admin = False, is_cardio = is_cardio, password = "abc" )
-      db.session.add(new_user) # add to database
-      db.session.commit() # for some reason we also need to commit it otherwise it won't add
-      return redirect('/users')#go to schedule after submit
-    else:
-      print("Invalid input(s)!")
-
-  # add html file here
-  return render_template('add.html', form = user_form)
-
-
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -352,6 +337,84 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
+
+def send_password_email(user):
+    token = user.get_reset_token()
+    msg = Message('Set ur goddamn Password here',
+                  sender='moonjelly323@gmail.com',
+                  recipients=[user.email])
+    msg.body = f'''To set your password, visit the following link:
+{url_for('set_token', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+@app.route('/add', methods = ['GET', 'POST'])
+@login_required
+def add():
+  user_form = UserForm()
+  if current_user.is_admin == None:
+    return redirect(url_for('homepage'))
+  else:
+    if request.method == 'POST': # for some reason request.method is 'GET' now??
+      first_name = request.form['first_name'] 
+      last_name = request.form['last_name']
+      email = request.form['email']
+      is_cardio = request.form['is_cardio']
+      is_admin = request.form['is_admin']
+      
+      # if the inputs we're all validated by WTforms (improve validation later)
+      if user_form.validate(): 
+        if is_cardio == 'True':
+          is_cardio = True
+        else:
+          is_cardio = False
+        if is_admin == 'True':
+          is_admin = True
+        else:
+          is_admin = False
+        new_user = User(email, first_name, last_name, is_admin, is_cardio, 'lolwat')
+        db.session.add(new_user) # add to database
+        db.session.commit() # for some reason we also need to commit it otherwise it won't add
+        send_password_email(new_user)
+        return redirect(url_for('homepage')) # go to homepage again 
+      else:
+        print("alright this dont work")
+        if is_cardio == 'True':
+          is_cardio = True
+        else:
+          is_cardio = False
+        if is_admin == 'True':
+          is_admin = True
+        else:
+          is_admin = False
+        new_user = User(email, first_name, last_name, is_admin, is_cardio, 'lolwat')
+        db.session.add(new_user) # add to database
+        db.session.commit() # for some reason we also need to commit it otherwise it won't add
+        send_password_email(new_user)
+        return redirect(url_for('homepage')) # go to homepage again 
+    else:
+      print(request.method)
+  return render_template('add.html', form = user_form)
+
+
+@app.route("/set_password/<token>", methods=['GET', 'POST'])
+def set_token(token):
+  if current_user.is_authenticated:
+    return redirect(url_for('logged_in_homepage'))
+  user = User.verify_reset_token(token)
+  if user is None:
+    flash('That is an invalid or expired token', 'warning')
+    return redirect(url_for('homepage'))
+  form = SetPasswordForm()
+  if form.validate():
+    password = request.form['password']
+    hashed_password = generate_password_hash(password, method = 'sha256') 
+    user.password = hashed_password
+    db.session.commit()
+    flash('Your password has been updated! You are now able to log in', 'success')
+    return redirect(url_for('login'))
+  return render_template('set_password.html', form=form)
 
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
