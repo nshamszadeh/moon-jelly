@@ -226,45 +226,6 @@ def load_user(user_id):
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
-# This is the main homepage for now. GET and POST are for web forms
-'''
-@app.route('/<name>/<location>')
-def pdf_template(name,location):
-  rendered=render_template('pdf_template.html',name=name,location=location)
-  pdf=pdfkit.from_string(rendered,False)
-
-  response=make_response(pdf)
-  respons.headers['Content-Type']='application/pdf'
-  response.headers['Content-Disposition']='inline; filename=output.pdf'
-
-  return response
-
-@app.route('/add', methods = ['GET', 'POST'])
-def add(): 
-  # define a form object
-  user_form = UserForm()
-
-  # if we are posting a form, i.e. submitting a form, store all the info in these variables
-  if request.method == 'POST':
-    email = request.form['email']
-    first_name = request.form['first_name'] 
-    last_name = request.form['last_name']
-    is_cardio = False
-
-    # if the inputs we're all validated by WTforms (improve validation later)
-    if user_form.validate(): 
-      # then store info in an initialized User object and store the object in the database
-      new_user = User(email, first_name, last_name, is_admin = False, is_cardio = is_cardio, password = "abc" )
-      db.session.add(new_user) # add to database
-      db.session.commit() # for some reason we also need to commit it otherwise it won't add
-      return redirect('/users')#go to schedule after submit
-    else:
-      print("Invalid input(s)!")
-
-  # add html file here
-  return render_template('add.html', form = user_form)
-
-'''
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -291,7 +252,7 @@ def view_invoice(business_name, tin):
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
-'''
+
 
 @app.route('/')
 def homepage():
