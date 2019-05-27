@@ -5,6 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from forms import LoginForm, UserForm, DeleteForm, RegisterForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
 from flask_table import Table, Col
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -44,6 +47,9 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Create our database model. 
+
+
+#QI use this one
 class User(UserMixin, db.Model):
 
   __tablename__ = "users" ##what does this do?
@@ -57,6 +63,20 @@ class User(UserMixin, db.Model):
   is_cardio = db.Column(db.Boolean)
   initials = db.Column(db.Text)
   password = db.Column(db.Text)
+  # firstam = db.Column(db.Integer)
+  # firstpm = db.Column(db.Integer)
+  # second = db.Column(db.Integer)
+  # third = db.Column(db.Integer)
+  # forth = db.Column(db.Integer)
+  # fifth = db.Column(db.Integer)
+  # sixth = db.Column(db.Integer)
+  # seventh = db.Column(db.Integer)
+  # postcall = db.Column(db.Boolean)
+  
+
+  #QI you're probably gonna need to add variables like the one below: 
+  #first_AM = db.Column(db.Integer)
+  
 
   # initialize the object
   def __init__(self, email, first_name, last_name, is_admin, is_cardio, password):
@@ -66,6 +86,15 @@ class User(UserMixin, db.Model):
     self.is_admin = is_admin
     self.is_cardio = is_cardio
     self.password = password 
+    # self.firstam = firstam
+    # self.firstpm = firstpm
+    # self.second = second
+    # self.third = third
+    # self.forth = forth
+    # self.fifth = fifth
+    # self.sixth = sixth
+    # self.seventh = seventh
+    # self.postcall = postcall
     self.initials = first_name[0] + last_name[0]
 
 class Number_Users(db.Model):
@@ -119,6 +148,42 @@ class Users_That_Day(db.Model):
     self.F1 = F1
     self.S1 = S1
     #self.is_current = True
+
+
+#Qi use this one
+class Day(db.Model):
+
+  __tablename__ = "Days" ##what does this do?
+
+  # Each day of sechedule will have all these things
+  id = db.Column(db.Date, primary_key=True)
+
+  first_AM = db.Column(db.Integer)
+  first_PM = db.Column(db.Integer)
+  second = db.Column(db.Integer)
+  third = db.Column(db.Integer)
+  fourth = db.Column(db.Integer)
+  fith = db.Column(db.Integer)
+  sixth = db.Column(db.Integer)
+  seventh = db.Column(db.Integer)
+  PostCall = db.Column(db.Integer)
+  Is_Weekend = db.Column(db.Boolean)
+
+
+  # initialize the object
+  def __init__(self, Is_Weekend, first_AM, first_PM, second, third, fourth, fith, sixth, seventh, PostCall):
+    
+    self.Is_Weekend = Is_Weekend
+
+    self.first_AM = first_AM
+    self.first_PM = first_PM
+    self.second = second
+    self.third = third
+    self.fourth = fourth
+    self.fith = fith
+    self.sixth = sixth
+    self.seventh = seventh
+    self.PostCall = PostCall
 
 # database table
 class UserTable(Table):
@@ -352,11 +417,11 @@ def users():
   utable = UserTable(u)
   return render_template('users.html', utable=utable)
 
-
-if __name__ == "__main__":
-    app.debug=True
-    app.run()
-
+@app.route('/slots')
+def slots():
+  u = slots.query.all()
+  utable = SlotTable(u)
+  return render_template('users.html', utable=utable)
 
   #create a schedule page
 @app.route('/make', methods=['GET', 'POST'])
@@ -416,6 +481,14 @@ def make2():
   F1 = []
   S1 = []
 
+  Su1_id = []
+  M1_id = []
+  T1_id = []
+  W1_id = []
+  Th1_id = []
+  F1_id = []
+  S1_id = []
+
 
   NU = Number_Users.query.all()
 
@@ -442,110 +515,145 @@ def make2():
     for entry in SchedForm.userfirstNamesSu.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Su1.append(U1.id)
+        Su1_id.append(U1.id)
+        M1.append(U1)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesM.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        M1.append(U1.id)
+        M1_id.append(U1.id)
+        M1.append(U1)
       else:
         print("not a valid first name")
     
     for entry in SchedForm.userfirstNamesT.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        T1.append(U1.id)
+        T1_id.append(U1.id)
+        T1.append(U1)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesW.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        W1.append(U1.id)
+        W1_id.append(U1.id)
+        W1.append(U1)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesTh.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Th1.append(U1.id)
+        Th1_id.append(U1.id)
+        Th1.append(U1)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesF.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        F1.append(U1.id)
+        F1_id.append(U1.id)
+        F1.append(U1)
       else:
         print("not a valid first name")
 
     for entry in SchedForm.userfirstNamesS.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        S1.append(U1.id)
+        S1_id.append(U1.id)
+        S1.append(U1)
       else:
         print("not a valid first name")
 
-
     if SchedForm.validate(): 
-      new_users_that_day = Users_That_Day(Su1, M1, T1, W1, Th1, F1, S1)
+      new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id)
       db.session.add(new_users_that_day) # add to database
+
+      matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1)    
+      for row in matrix:
+       for slot in row:
+        db.session.add(slot)
+
       db.session.commit()
       return(redirect('/schedule'))
+
   
   print("SchedForm.errors = ", SchedForm.errors)
   #print("Su1 = ",Su1)
 
   return render_template('make2.html', schedForm = SchedForm)
 
+
+class slots(db.Model):
+
+
+  __tablename__ = "slots_db"
+
+  id = db.Column(db.Integer, primary_key=True)
+  daynumber = db.Column(db.Integer)
+  shiftnumber = db.Column(db.Integer)
+  doctorID = db.Column(db.Integer, ForeignKey('users.id'))
+  doctor = relationship("User")
+
+  # initialize the object
+  def __init__(self, daynumber, shiftnumber, doctorID):
+    self.daynumber = daynumber
+    self.shiftnumber = shiftnumber
+    self.doctorID = doctorID
+
+class SlotTable(Table):
+   id = Col('db id')
+   daynumber = Col('day #')
+   shiftnumber = Col('shirft #')
+   doctorID = Col('Doctor id')
+
+def sorter(Su1, M1, T1, W1, Th1, F1, S1):
+  #construct a schedule table with slots
+  matrix = [[None for y in range(0,7)] for x in range(0,9)]
+  for i in range(0,9):
+   for j in range(0,7):
+    matrix[i][j] = slots(j + 1, i + 1, doctorID = None)
+
+  for i in range(0,len(M1)):
+   matrix[i][0].doctorID = M1[i].id
+
+  for i in range(0,len(T1)):
+   matrix[i][1].doctorID = T1[i].id
+
+  for i in range(0,len(W1)):
+   matrix[i][2].doctorID = W1[i].id
+
+  for i in range(0,len(Th1)):
+   matrix[i][3].doctorID = Th1[i].id
+
+  for i in range(0,len(F1)):
+   matrix[i][4].doctorID = F1[i].id
+
+  for i in range(0,len(S1)):
+   matrix[i][5].doctorID = S1[i].id
+
+  for i in range(0,len(Su1)):
+   matrix[i][6].doctorID = Su1[i].id
+
+  return matrix
+  #sort so every user gets around the same number of spots
+  #if there are less users than spots, dont fill the higher numbered spots
+  #whoever works 'first_PM' will work 'PostCall' the next day always
+
+
+
 @app.route('/schedule')
 @login_required
 def schedule():
+  s = slots.query.all()
+  grid = []
+  for i in range(0, len(s), 7):
+   grid.append(s[i:i+7])
+  return render_template('schedule.html', matrix = grid)
   
-  UTD = Users_That_Day.query.all()
-  print("UTD = ", UTD)
-
-  if(UTD == []):
-    return render_template('schedule.html', Suulist = None, 
-                                         Mulist = None, 
-                                         Tulist = None, 
-                                         Wulist = None, 
-                                         Thulist = None, 
-                                         Fulist = None, 
-                                         Sulist = None)
-  else:
-    Su1 = UTD[-1].Su1
-    M1 = UTD[-1].M1
-    T1 = UTD[-1].T1
-    W1 = UTD[-1].W1
-    Th1 = UTD[-1].Th1
-    F1 = UTD[-1].F1
-    S1 = UTD[-1].S1
-    return render_template('schedule.html', Suulist = Su1, 
-                                         Mulist = M1, 
-                                         Tulist = T1, 
-                                         Wulist = W1, 
-                                         Thulist = Th1, 
-                                         Fulist = F1, 
-                                         Sulist = S1)
-
-def sorter(Su1, M1, T1, W1, Th1, F1, S1):
-  print("<User1> type = ", type(Su1[0]))
-  print("<User1> name = ", Su1[0].first_name)
-
-  #if(Su1[0] != User.query.filter_by(first_name="Test1").first()):
-    #print("Su1 first shouldnt be Test1")
-  print("Su1 = ", Su1)
-  print("M1 = ", M1)
-  print("T1 = ", T1)
-  print("W1 = ", W1)
-  print("Th1 = ", Th1)
-  print("F1 = ", F1)
-  print("S1 = ", S1)
-
-  return()
 
 @app.route("/logout")
 @login_required
