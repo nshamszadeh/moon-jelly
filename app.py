@@ -1,7 +1,5 @@
 import os
 import subprocess
-import csv
-import pdfkit 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
@@ -12,12 +10,9 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-#import StringIO
-import csv
+
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
-#import flask_excel as excel
-import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
 from flask_mail import Mail, Message
@@ -36,8 +31,6 @@ app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-          
-#pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
