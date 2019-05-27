@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-import StringIO
+#import StringIO
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -259,7 +259,7 @@ class Pdf():
 
         return pdf.getvalue()
 
-
+'''
 @app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
 def view_invoice(business_name, tin):
 
@@ -283,6 +283,7 @@ def homepage():
       return render_template('home2.html') # else link the login page (admins add users)
     else:
       return redirect(url_for('logged_in_homepage'))
+'''
 
 @app.route('/logged_in_homepage')
 @login_required
