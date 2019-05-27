@@ -13,7 +13,9 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
-#import StringIO
+from io import StringIO
+from xhtml2pdf import pisa
+
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -238,16 +240,13 @@ class Pdf():
 
     def render_pdf(self, name, html):
 
-        from xhtml2pdf import pisa
-        from StringIO import StringIO
-
         pdf = StringIO()
 
         pisa.CreatePDF(StringIO(html), pdf)
 
         return pdf.getvalue()
 
-'''
+
 @app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
 def view_invoice(business_name, tin):
 
@@ -261,7 +260,6 @@ def view_invoice(business_name, tin):
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
 
-
 @app.route('/')
 def homepage():
   if db.session.query(User).first() == None: # if there are no registered users
@@ -271,7 +269,7 @@ def homepage():
       return render_template('home2.html') # else link the login page (admins add users)
     else:
       return redirect(url_for('logged_in_homepage'))
-'''
+
 
 @app.route('/logged_in_homepage')
 @login_required
@@ -580,7 +578,7 @@ def make2():
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         Su1_id.append(U1.id)
-        M1.append(U1)
+        Su1.append(U1)
       else:
         print("not a valid first name")
 
@@ -681,26 +679,75 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    for j in range(0,7):
     matrix[i][j] = slots(j + 1, i + 1, doctorID = None)
 
+  k = 1
+  filled = False
   for i in range(0,len(M1)):
-   matrix[i][0].doctorID = M1[i].id
-
+   if M1[i].is_cardio is True and filled is False:
+    matrix[0][0].doctorID = M1[i].id
+    filled = True
+   else:
+    matrix[k][0].doctorID = M1[i].id
+    k += 1
+  
+  k = 1
+  filled = False
   for i in range(0,len(T1)):
-   matrix[i][1].doctorID = T1[i].id
+   if T1[i].is_cardio is True and filled is False:
+    matrix[0][1].doctorID = T1[i].id
+    filled = True
+   else:
+    matrix[k][1].doctorID = T1[i].id
+    k += 1
 
+  k = 1
+  filled = False
   for i in range(0,len(W1)):
-   matrix[i][2].doctorID = W1[i].id
+   if W1[i].is_cardio is True and filled is False:
+    matrix[0][2].doctorID = W1[i].id
+    filled = True
+   else:
+    matrix[k][2].doctorID = W1[i].id
+    k += 1
 
+  k = 1
+  filled = False
   for i in range(0,len(Th1)):
-   matrix[i][3].doctorID = Th1[i].id
+   if Th1[i].is_cardio is True and filled is False:
+    matrix[0][3].doctorID = Th1[i].id
+    filled = True
+   else:
+    matrix[k][3].doctorID = Th1[i].id
+    k += 1
 
+  k = 1
+  filled = False
   for i in range(0,len(F1)):
-   matrix[i][4].doctorID = F1[i].id
+   if F1[i].is_cardio is True and filled is False:
+    matrix[0][4].doctorID = F1[i].id
+    filled = True
+   else:
+    matrix[k][4].doctorID = F1[i].id
+    k += 1
 
+  k = 1
+  filled = False
   for i in range(0,len(S1)):
-   matrix[i][5].doctorID = S1[i].id
+   if S1[i].is_cardio is True and filled is False:
+    matrix[0][5].doctorID = S1[i].id
+    filled = True
+   else:
+    matrix[k][5].doctorID = S1[i].id
+    k += 1
 
+  k = 1
+  filled = False
   for i in range(0,len(Su1)):
-   matrix[i][6].doctorID = Su1[i].id
+   if Su1[i].is_cardio is True and filled is False:
+    matrix[0][6].doctorID = Su1[i].id
+    filled = True
+   else:
+    matrix[k][6].doctorID = Su1[i].id
+    k += 1
 
   return matrix
   #sort so every user gets around the same number of spots
