@@ -29,7 +29,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER'''
 
 
-#pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')  
+pdfkit.from_url('https://moon-jelly.herokuapp.com/', 'schedule.pdf')  
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -249,7 +249,7 @@ def add():
   # add html file here
   return render_template('add.html', form = user_form)
 
-'''
+
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -276,8 +276,6 @@ def view_invoice(business_name, tin):
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
-
-'''
 
 @app.route('/')
 def homepage():
