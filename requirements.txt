@@ -34,4 +34,4 @@ Werkzeug==0.15.2
 WTForms==2.2.1
 pdfkit==0.6.1
 wkhtmltopdf==0.2
-xhtml2pdf==0.2.3
+xhtml2pdf==0.2.1
