@@ -20,10 +20,16 @@ class UserForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name', [validators.DataRequired(message = 'Please Enter Something')])
 	email = StringField('Email', [validators.Email(message = 'Please Enter A Valid Email')])
-	is_cardio = BooleanField('Cardiologist?')
+	is_cardio = SelectField('Cardiologist?', choices=[('True', 'Yes'), ('False', 'No')])	
+	is_admin = SelectField('Administrator? (can add/remove users)', choices=[('False', 'No'), ('True', 'Yes')])
 
 class DeleteForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
+	last_name = StringField('Last Name')
+	email = StringField('Email')
+
+class SetPasswordForm(FlaskForm):
+	password = PasswordField('Password', [validators.DataRequired(message = 'Please Enter Something')])
 
 class ScheduleEntryForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
@@ -45,3 +51,4 @@ class NumberUsersForm(FlaskForm):
 	NumberUsersTh = IntegerField('# Working on Thursday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 	NumberUsersF = IntegerField('# Working on Friday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 	NumberUsersS = IntegerField('# Working on Saturday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+
