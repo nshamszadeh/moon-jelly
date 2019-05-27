@@ -21,6 +21,7 @@ from flask import Flask, request, jsonify
 
 import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
+from flask_table import Table, Col 
 
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
@@ -29,11 +30,7 @@ from flask_migrate import Migrate
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
-'''UPLOAD_FOLDER = 'C:/Users/jenny/Desktop/moon-jelly/img'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-'''
 app = Flask(__name__)
-
 
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -219,15 +216,14 @@ class Day(db.Model):
 
 # database table
 class UserTable(Table):
-    id = Col('id')
+    id = Col('Id')
     email = Col('Email')
     first_name = Col('First Name')
     last_name = Col('Last Name')
     initials = Col('initials')
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
-    password = Col('Password')
-
+    password = Col('Password',show=False)
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -251,7 +247,7 @@ class Pdf():
 
         return pdf.getvalue()
 
-
+'''
 @app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
 def view_invoice(business_name, tin):
 
@@ -275,6 +271,7 @@ def homepage():
       return render_template('home2.html') # else link the login page (admins add users)
     else:
       return redirect(url_for('logged_in_homepage'))
+'''
 
 @app.route('/logged_in_homepage')
 @login_required
@@ -457,12 +454,7 @@ def about():
   #dir:command you want to run(name)
   return render_template('about.html', message=message)
 
-#upload photos 
-'''
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-'''
+
 
 @app.route('/profile')
 @login_required
