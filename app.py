@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-import StringIO
+#import StringIO
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 
 
-pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
+
 
 
 #let website reload properly 
@@ -660,6 +660,7 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
+pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
 
 
 if __name__ == '__main__':
