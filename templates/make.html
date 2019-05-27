@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% block body %}
+     <form action="" method="POST">
+            {% for field in numuForm  %}
+            <p>
+                {{field.label}}
+                {{field}}
+            </p>
+            {% endfor %}
+            <button>
+                Submit
+            </button>
+        </form>
+{% endblock %}
+
+
+
+
+

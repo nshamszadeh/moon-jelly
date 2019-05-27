@@ -1,17 +1,27 @@
 import os
 import subprocess
+import csv
+import pdfkit 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from flask_mail import Mail, Message
-from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for
+from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
+'''UPLOAD_FOLDER = 'C:/Users/jenny/Desktop/moon-jelly/img'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+'''
 app = Flask(__name__)
+
 
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -20,7 +30,9 @@ app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-           
+          
+#pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
+
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -39,9 +51,12 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Create our database model. 
+
+
+#QI use this one
 class User(UserMixin, db.Model):
 
-  __tablename__ = "users"
+  __tablename__ = "users" ##what does this do?
 
   # Each user (doctor) will have all these things attributed to him or her
   id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +67,20 @@ class User(UserMixin, db.Model):
   is_cardio = db.Column(db.Boolean)
   initials = db.Column(db.Text)
   password = db.Column(db.Text)
+  # firstam = db.Column(db.Integer)
+  # firstpm = db.Column(db.Integer)
+  # second = db.Column(db.Integer)
+  # third = db.Column(db.Integer)
+  # forth = db.Column(db.Integer)
+  # fifth = db.Column(db.Integer)
+  # sixth = db.Column(db.Integer)
+  # seventh = db.Column(db.Integer)
+  # postcall = db.Column(db.Boolean)
+  
+
+  #QI you're probably gonna need to add variables like the one below: 
+  #first_AM = db.Column(db.Integer)
+  
 
   # some uh methods for things and stuff 
   def get_reset_token(self, expires_sec=1800):
@@ -75,7 +104,118 @@ class User(UserMixin, db.Model):
     self.is_admin = is_admin
     self.is_cardio = is_cardio
     self.password = password 
+
+    # self.firstam = firstam
+    # self.firstpm = firstpm
+    # self.second = second
+    # self.third = third
+    # self.forth = forth
+    # self.fifth = fifth
+    # self.sixth = sixth
+    # self.seventh = seventh
+    # self.postcall = postcall
+
     self.initials = first_name[0] + last_name[0]
+
+class Number_Users(db.Model):
+
+  __tablename__ = "number_users_db"
+
+  
+  id = db.Column(db.Integer, primary_key=True)
+  number_usersSu = db.Column(db.Integer)
+  number_usersM = db.Column(db.Integer)
+  number_usersT = db.Column(db.Integer)
+  number_usersW = db.Column(db.Integer)
+  number_usersTh = db.Column(db.Integer)
+  number_usersF = db.Column(db.Integer)
+  number_usersS = db.Column(db.Integer)
+  #is_current = dbColumn(db.Boolean)
+
+  # initialize the object
+  def __init__(self, number_usersSu, number_usersM, number_usersT, number_usersW, number_usersTh, number_usersF, number_usersS):
+    self.number_usersSu = number_usersSu
+    self.number_usersM = number_usersM
+    self.number_usersT = number_usersT
+    self.number_usersW = number_usersW
+    self.number_usersTh = number_usersTh
+    self.number_usersF = number_usersF
+    self.number_usersS = number_usersS
+    #self.is_current = True
+
+class Users_That_Day(db.Model):
+
+  __tablename__ = "Users_That_Day_db"
+
+  
+  id = db.Column(db.Integer, primary_key=True)
+  Su1 = db.Column(ARRAY(db.Integer))
+  M1 = db.Column(ARRAY(db.Integer))
+  T1 = db.Column(ARRAY(db.Integer))
+  W1 = db.Column(ARRAY(db.Integer))
+  Th1 = db.Column(ARRAY(db.Integer))
+  F1 = db.Column(ARRAY(db.Integer))
+  S1 = db.Column(ARRAY(db.Integer))
+  #is_current = dbColumn(db.Boolean)
+
+  # initialize the object
+  def __init__(self, Su1, M1, T1, W1, Th1, F1, S1):
+    self.Su1 = Su1
+    self.M1 = M1
+    self.T1 = T1
+    self.W1 = W1
+    self.Th1 = Th1
+    self.F1 = F1
+    self.S1 = S1
+    #self.is_current = True
+
+
+#Qi use this one
+class Day(db.Model):
+
+  __tablename__ = "Days" ##what does this do?
+
+  # Each day of sechedule will have all these things
+  id = db.Column(db.Date, primary_key=True)
+
+  first_AM = db.Column(db.Integer)
+  first_PM = db.Column(db.Integer)
+  second = db.Column(db.Integer)
+  third = db.Column(db.Integer)
+  fourth = db.Column(db.Integer)
+  fith = db.Column(db.Integer)
+  sixth = db.Column(db.Integer)
+  seventh = db.Column(db.Integer)
+  PostCall = db.Column(db.Integer)
+  Is_Weekend = db.Column(db.Boolean)
+
+
+  # initialize the object
+  def __init__(self, Is_Weekend, first_AM, first_PM, second, third, fourth, fith, sixth, seventh, PostCall):
+    
+    self.Is_Weekend = Is_Weekend
+
+    self.first_AM = first_AM
+    self.first_PM = first_PM
+    self.second = second
+    self.third = third
+    self.fourth = fourth
+    self.fith = fith
+    self.sixth = sixth
+    self.seventh = seventh
+    self.PostCall = PostCall
+
+# database table
+class UserTable(Table):
+    id = Col('id')
+    email = Col('Email')
+    first_name = Col('First Name')
+    last_name = Col('Last Name')
+    initials = Col('initials')
+    is_admin = Col('Administrator?')
+    is_cardio = Col('Cardiologist?')
+    password = Col('Password')
+
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -86,16 +226,33 @@ def load_user(user_id):
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
-# database table
-class UserTable(Table):
-    id = Col('id')
-    email = Col('Email')
-    first_name = Col('First Name')
-    last_name = Col('Last Name')
-    is_admin = Col('Administrator?')
-    is_cardio = Col('Cardiologist?')
-    initials = Col('Initials')
-    password = Col('Password')
+class Pdf():
+
+    def render_pdf(self, name, html):
+
+        from xhtml2pdf import pisa
+        from StringIO import StringIO
+
+        pdf = StringIO()
+
+        pisa.CreatePDF(StringIO(html), pdf)
+
+        return pdf.getvalue()
+
+
+@app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
+def view_invoice(business_name, tin):
+
+    #pdf = StringIO()
+    html = render_template(
+        'schedule.html', business_name=business_name, tin=tin)
+    file_class = Pdf()
+    pdf = file_class.render_pdf(business_name, html)
+    headers = {
+        'content-type': 'application.pdf',
+        'content-disposition': 'attachment; filename=certificate.pdf'}
+    return pdf, 200, headers
+
 
 @app.route('/')
 def homepage():
@@ -132,7 +289,6 @@ def login():
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
-
   # define a form object
   register_form = RegisterForm()
 
@@ -217,7 +373,7 @@ def add():
         send_password_email(new_user)
         return redirect(url_for('homepage')) # go to homepage again 
       else:
-        print("fuckin shit")
+        print("alright this dont work")
         if is_cardio == 'True':
           is_cardio = True
         else:
@@ -268,28 +424,44 @@ def remove():
         toRM = User.query.filter_by(first_name = Name2Rm).first()
         db.session.delete(toRM)
         db.session.commit()
-        return redirect(url_for('schedule'))
+        return redirect('/users')
       else:
         print("User First Name Not Found")
     else:
       print("Invalid input(s)!")
-      #Mbox('Warning!', 'Email is not correct!', 0)
 
-  # add html file here
   return render_template('remove.html', delete_form = delete_form)
 
 @app.route('/img/<path:path>')
-
 def send_js(path):
     return send_from_directory('img', path)
 
 @app.route('/about')
-
 def about():
-  return render_template('about.html')
+  try:
+    message = subprocess.check_output(['hi'], shell=True)
+  except:
+    message = "Sorry, we coundn't run that command..."
+  #dir:command you want to run(name)
+  return render_template('about.html', message=message)
+
+#upload photos 
+'''
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+'''
+
+@app.route('/profile')
+@login_required
+def profile():
+  return render_template('profile.html')
+
+@app.route('/Jenny')
+def Jenny():
+  return render_template('Jenny.html')
 
 @app.route('/contact')
-
 def contact():
   try:
     message = subprocess.check_output(['hi'], shell=True)
@@ -298,17 +470,6 @@ def contact():
   #dir:command you want to run(name)
   return render_template('contact.html', message=message)
 
-#create a schedule page
-@app.route('/schedule')
-@login_required
-def schedule():
-  # current_user is where the logged in user is stored
-
-  u = User.query.all()
-  utable = UserTable(u)
-  #cardi = User.query.filter_by(specialty="cardiologist").all()
-  return render_template('schedule.html', users=u, utable=utable)
-
 #test to print out the first names of users 
 @app.route('/users')
 def users():
@@ -316,14 +477,251 @@ def users():
   utable = UserTable(u)
   return render_template('users.html', utable=utable)
 
-#return render_template('home.html', form = user_form)
+@app.route('/slots')
+def slots():
+  u = slots.query.all()
+  utable = SlotTable(u)
+  return render_template('users.html', utable=utable)
 
+  #create a schedule page
+@app.route('/make', methods=['GET', 'POST'])
+def make():
+
+  numuForm = NumberUsersForm()
+
+
+  if request.method == 'POST':
+
+    if(request.form['NumberUsersM'].isdigit()):
+      number_usersM = int(request.form['NumberUsersM'])
+
+    if(request.form['NumberUsersT'].isdigit()):
+      number_usersT = int(request.form['NumberUsersT'])
+    
+    if(request.form['NumberUsersW'].isdigit()):
+     number_usersW = int(request.form['NumberUsersW'])
+    
+    if(request.form['NumberUsersTh'].isdigit()):
+     number_usersTh = int(request.form['NumberUsersTh'])
+    
+    if(request.form['NumberUsersF'].isdigit()):
+      number_usersF = int(request.form['NumberUsersF'])
+    
+    if(request.form['NumberUsersS'].isdigit()):
+     number_usersS = int(request.form['NumberUsersS'])
+    
+    if(request.form['NumberUsersSu'].isdigit()):
+      number_usersSu = int(request.form['NumberUsersSu'])
+   
+
+    if numuForm.validate(): 
+      new_number_users = Number_Users(number_usersSu, 
+                                      number_usersM, 
+                                      number_usersT, 
+                                      number_usersW, 
+                                      number_usersTh, 
+                                      number_usersF, 
+                                      number_usersS)
+      db.session.add(new_number_users)
+      db.session.commit()
+
+      return redirect('/make2')
+  return render_template('make.html', numuForm = numuForm)
+
+@app.route('/make2', methods=['GET', 'POST'])
+def make2():
+
+  #global variables for making schedule
+
+  Su1 = []
+  M1= []
+  T1 = []
+  W1 = []
+  Th1 = []
+  F1 = []
+  S1 = []
+
+  Su1_id = []
+  M1_id = []
+  T1_id = []
+  W1_id = []
+  Th1_id = []
+  F1_id = []
+  S1_id = []
+
+
+  NU = Number_Users.query.all()
+
+  userfirstNamesSu = ["first_name"]*NU[-1].number_usersSu
+  userfirstNamesM = ["first_name"]*NU[-1].number_usersM
+  userfirstNamesT = ["first_name"]*NU[-1].number_usersT
+  userfirstNamesW = ["first_name"]*NU[-1].number_usersW
+  userfirstNamesTh = ["first_name"]*NU[-1].number_usersTh
+  userfirstNamesF = ["first_name"]*NU[-1].number_usersF
+  userfirstNamesS = ["first_name"]*NU[-1].number_usersS
+  SchedForm = ScheduleForm(request.form,
+                           userfirstNamesSu=userfirstNamesSu,
+                           userfirstNamesM=userfirstNamesM,
+                           userfirstNamesT=userfirstNamesT,
+                           userfirstNamesW=userfirstNamesW,
+                           userfirstNamesTh=userfirstNamesTh,
+                           userfirstNamesF=userfirstNamesF,
+                           userfirstNamesS=userfirstNamesS)
+  
+
+
+  if request.method == 'POST':
+    
+    for entry in SchedForm.userfirstNamesSu.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Su1_id.append(U1.id)
+        M1.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesM.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        M1_id.append(U1.id)
+        M1.append(U1)
+      else:
+        print("not a valid first name")
+    
+    for entry in SchedForm.userfirstNamesT.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        T1_id.append(U1.id)
+        T1.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesW.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        W1_id.append(U1.id)
+        W1.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesTh.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Th1_id.append(U1.id)
+        Th1.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesF.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        F1_id.append(U1.id)
+        F1.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesS.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        S1_id.append(U1.id)
+        S1.append(U1)
+      else:
+        print("not a valid first name")
+
+    if SchedForm.validate(): 
+      new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id)
+      db.session.add(new_users_that_day) # add to database
+
+      matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1)    
+      for row in matrix:
+       for slot in row:
+        db.session.add(slot)
+
+      db.session.commit()
+      return(redirect('/schedule'))
+
+  
+  print("SchedForm.errors = ", SchedForm.errors)
+  #print("Su1 = ",Su1)
+
+  return render_template('make2.html', schedForm = SchedForm)
+
+
+class slots(db.Model):
+
+
+  __tablename__ = "slots_db"
+
+  id = db.Column(db.Integer, primary_key=True)
+  daynumber = db.Column(db.Integer)
+  shiftnumber = db.Column(db.Integer)
+  doctorID = db.Column(db.Integer, ForeignKey('users.id'))
+  doctor = relationship("User")
+
+  # initialize the object
+  def __init__(self, daynumber, shiftnumber, doctorID):
+    self.daynumber = daynumber
+    self.shiftnumber = shiftnumber
+    self.doctorID = doctorID
+
+class SlotTable(Table):
+   id = Col('db id')
+   daynumber = Col('day #')
+   shiftnumber = Col('shirft #')
+   doctorID = Col('Doctor id')
+
+def sorter(Su1, M1, T1, W1, Th1, F1, S1):
+  #construct a schedule table with slots
+  matrix = [[None for y in range(0,7)] for x in range(0,9)]
+  for i in range(0,9):
+   for j in range(0,7):
+    matrix[i][j] = slots(j + 1, i + 1, doctorID = None)
+
+  for i in range(0,len(M1)):
+   matrix[i][0].doctorID = M1[i].id
+
+  for i in range(0,len(T1)):
+   matrix[i][1].doctorID = T1[i].id
+
+  for i in range(0,len(W1)):
+   matrix[i][2].doctorID = W1[i].id
+
+  for i in range(0,len(Th1)):
+   matrix[i][3].doctorID = Th1[i].id
+
+  for i in range(0,len(F1)):
+   matrix[i][4].doctorID = F1[i].id
+
+  for i in range(0,len(S1)):
+   matrix[i][5].doctorID = S1[i].id
+
+  for i in range(0,len(Su1)):
+   matrix[i][6].doctorID = Su1[i].id
+
+  return matrix
+  #sort so every user gets around the same number of spots
+  #if there are less users than spots, dont fill the higher numbered spots
+  #whoever works 'first_PM' will work 'PostCall' the next day always
+
+
+
+@app.route('/schedule')
+@login_required
+def schedule():
+  s = slots.query.all()
+  grid = []
+  for i in range(0, len(s), 7):
+   grid.append(s[i:i+7])
+  return render_template('schedule.html', matrix = grid)
+  
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('homepage'))
+
+
 
 if __name__ == '__main__':
   app.run(debug=True, use_reloader=True)
