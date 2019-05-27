@@ -1,7 +1,5 @@
 import os
 import subprocess
-import csv
-import pdfkit 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
@@ -10,6 +8,13 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
+from flask import Flask, make_response, render_template
+from flask import Flask, request, jsonify
+from flask import Flask, flash, request, redirect, url_for
+from flask_table import Table, Col 
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -17,11 +22,7 @@ from flask_migrate import Migrate
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
-'''UPLOAD_FOLDER = 'C:/Users/jenny/Desktop/moon-jelly/img'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-'''
 app = Flask(__name__)
-
 
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -30,8 +31,6 @@ app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-          
-#pdfkit.from_url('https://www.google.com', 'schedule.pdf')  
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -207,15 +206,14 @@ class Day(db.Model):
 
 # database table
 class UserTable(Table):
-    id = Col('id')
+    id = Col('Id')
     email = Col('Email')
     first_name = Col('First Name')
     last_name = Col('Last Name')
     initials = Col('initials')
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
-    password = Col('Password')
-
+    password = Col('Password',show=False)
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -225,7 +223,7 @@ def load_user(user_id):
 # wtf does this do
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
-
+  
 class Pdf():
 
     def render_pdf(self, name, html):
@@ -331,7 +329,6 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
-
 def send_password_email(user):
     token = user.get_reset_token()
     msg = Message('Set ur goddamn Password here',
@@ -342,7 +339,7 @@ def send_password_email(user):
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
     mail.send(msg)
-
+    
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
 def add():
@@ -445,12 +442,7 @@ def about():
   #dir:command you want to run(name)
   return render_template('about.html', message=message)
 
-#upload photos 
-'''
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-'''
+
 
 @app.route('/profile')
 @login_required
