@@ -238,10 +238,8 @@ def pdf_template(name,location):
   response.headers['Content-Disposition']='inline; filename=output.pdf'
 
   return response
-'''
 
 @app.route('/add', methods = ['GET', 'POST'])
-
 def add(): 
   # define a form object
   user_form = UserForm()
@@ -414,7 +412,7 @@ def add():
         send_password_email(new_user)
         return redirect(url_for('homepage')) # go to homepage again 
       else:
-        print("fuckin shit")
+        print("alright this dont work")
         if is_cardio == 'True':
           is_cardio = True
         else:
