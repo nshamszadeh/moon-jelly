@@ -23,11 +23,6 @@ from flask_table import Table, Col
 
 app = Flask(__name__)
 
-
-
-pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
-
-
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -660,7 +655,7 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
-
+pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
 
 if __name__ == '__main__':
   app.run(debug=True, use_reloader=True)
