@@ -331,6 +331,11 @@ def send_js(path):
 def about():
   return render_template('about.html')
 
+@app.route('/profile')
+@login_required
+def profile():
+  return render_template('profile.html')
+
 @app.route('/contact')
 def contact():
   try:
@@ -541,19 +546,6 @@ class SlotTable(Table):
    doctorID = Col('Doctor id')
 
 def sorter(Su1, M1, T1, W1, Th1, F1, S1):
-  #THIS IS A SHELL, ALL THESE PRINTS CAN BE DELETED, SHOULD SAVE 7 'DAY' OBJECTS
-
-  # print("<User1> type = ", type(Su1[0]))
-  # print("<User1> name = ", Su1[0].first_name)
-
-  # print("Su1 = ", Su1)
-  # print("M1 = ", M1)
-  # print("T1 = ", T1)
-  # print("W1 = ", W1)
-  # print("Th1 = ", Th1)
-  # print("F1 = ", F1)
-  # print("S1 = ", S1)
-  
   #construct a schedule table with slots
   matrix = [[None for y in range(0,7)] for x in range(0,9)]
   for i in range(0,9):
@@ -586,20 +578,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
   #if there are less users than spots, dont fill the higher numbered spots
   #whoever works 'first_PM' will work 'PostCall' the next day always
 
-  #figure out how to choose which days are weekend days
-  #psuedocode for sorting function
-
-  #if(somesorrting  thing)
-  #first_AM = SU1[0].id
-
-  #sunday = Day(first_AM, first_PM, second, third, fourth, fith, sixth, seventh, PostCall)
-  #db.session.add(sunday) # add to database
-  #db.session.commit() # for some reason we also need to commit it otherwise it won't add 
-  
-  
-
-
-
 
 
 @app.route('/schedule')
@@ -611,42 +589,14 @@ def schedule():
    grid.append(s[i:i+7])
   return render_template('schedule.html', matrix = grid)
   
-  # UTD = Users_That_Day.query.all()
-  # print("UTD = ", UTD)
-
-  # if(UTD == []):
-    # return render_template('schedule.html', Suulist = None, 
-    #                                      Mulist = None, 
-    #                                      Tulist = None, 
-    #                                      Wulist = None, 
-    #                                      Thulist = None, 
-    #                                      Fulist = None, 
-    #                                      Sulist = None)
-  # else:
-  #   Su1 = UTD[-1].Su1
-  #   M1 = UTD[-1].M1
-  #   T1 = UTD[-1].T1
-  #   W1 = UTD[-1].W1
-  #   Th1 = UTD[-1].Th1
-  #   F1 = UTD[-1].F1
-  #   S1 = UTD[-1].S1
-  #   return render_template('schedule.html', Suulist = Su1, 
-  #                                        Mulist = M1, 
-  #                                        Tulist = T1, 
-  #                                        Wulist = W1, 
-  #                                        Thulist = Th1, 
-  #                                        Fulist = F1, 
-  #                                        Sulist = S1)
-
-
-#return render_template('home.html', form = user_form)
-
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('homepage'))
+
+
 
 if __name__ == '__main__':
   app.run(debug=True, use_reloader=True)
