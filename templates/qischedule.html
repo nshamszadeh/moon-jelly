@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-
 <div id="schedule">
 <div class="container-fluid padding">
 <div class="row welcome text-center">
@@ -10,7 +9,7 @@
   </div>
 </div>
 </div>
-
+<!-- first row -->
 <div class="row">
   <div class="col">
     Pos\Day
@@ -38,48 +37,17 @@
   </div>
 </div>
 
-{%for row in matrix%}
+{%for i in range(0,5)%}
 <div class="row">
   <div class="col">
-    Pos#N
+    Pos#{{i}}
   </div>
-  {%for slot in row%}
+  {%for j in range(0,7)%}
     <div class="col">
-      {{slot.doctor.first_name}}
+      {{users[i]}}
     </div>
   {%endfor%}
 </div>
 {%endfor%}
 
-</div>
-
-<!-- <table style="width:100%">
-
-
-  <tr>
-    <th>Mon</th>
-    <th>Tue</th> 
-    <th>Wed</th>
-    <th>Thu</th>
-    <th>Fri</th>
-    <th>Sat</th>
-    <th>Sun</th>
-  </tr>
-
- <tr>
-     {{utable}}
- </tr>
-
-<tr>
-    <th>{{Mulist}}</th>
-    <th>{{Tulist}}</th> 
-    <th>{{Wulist}}</th>
-    <th>{{Thulist}}</th>
-    <th>{{Fulist}}</th>
-    <th>{{Sulist}}</th>
-    <th>{{Suulist}}</th>
-  </tr>
-
-</table>  -->
-    
 {% endblock %}
