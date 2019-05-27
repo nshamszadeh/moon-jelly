@@ -329,21 +329,18 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
-'''
 def send_password_email(user):
     token = user.get_reset_token()
     msg = Message('Set ur goddamn Password here',
                   sender='moonjelly323@gmail.com',
                   recipients=[user.email])
-    msg.body = f'''
-
-'''To set your password, visit the following link:
+    msg.body = f'''To set your password, visit the following link:
 {url_for('set_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-'''
+
     mail.send(msg)
-'''
+
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
 def add():
