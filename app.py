@@ -37,7 +37,7 @@ app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
-#app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -966,8 +966,12 @@ def make2():
   
   print("SchedForm.errors = ", SchedForm.errors)
   #print("Su1 = ",Su1)
-
-  return render_template('make2.html', schedForm = SchedForm)
+  
+  s = slots.query.all()
+  grid = []
+  for i in range(0, len(s), 7):
+   grid.append(s[i:i+7])
+  return render_template('make2.html', matrix = grid, schedForm = SchedForm)
 
 
 class slots(db.Model):
@@ -1086,11 +1090,12 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
 @app.route('/schedule')
 @login_required
 def schedule():
-  s = slots.query.all()
-  grid = []
-  for i in range(0, len(s), 7):
-   grid.append(s[i:i+7])
-  return render_template('schedule.html', matrix = grid)
+  # s = slots.query.all()
+  # grid = []
+  # for i in range(0, len(s), 7):
+  #  grid.append(s[i:i+7])
+  # return render_template('schedule.html', matrix = grid)
+  return render_template('schedule.html')
   
 
 @app.route("/logout")
