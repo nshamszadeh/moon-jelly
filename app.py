@@ -695,6 +695,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][1].doctorID = T1[i].id
     k += 1
+   matrix[8][1].doctorID = matrix[0][0].doctorID
 
   k = 1
   filled = False
@@ -705,6 +706,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][2].doctorID = W1[i].id
     k += 1
+   matrix[8][2].doctorID = matrix[0][1].doctorID
 
   k = 1
   filled = False
@@ -715,6 +717,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][3].doctorID = Th1[i].id
     k += 1
+   matrix[8][3].doctorID = matrix[0][2].doctorID
 
   k = 1
   filled = False
@@ -725,6 +728,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][4].doctorID = F1[i].id
     k += 1
+   matrix[8][4].doctorID = matrix[0][3].doctorID
 
   k = 1
   filled = False
@@ -735,6 +739,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][5].doctorID = S1[i].id
     k += 1
+   matrix[8][5].doctorID = matrix[0][4].doctorID
 
   k = 1
   filled = False
@@ -745,6 +750,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    else:
     matrix[k][6].doctorID = Su1[i].id
     k += 1
+   matrix[8][6].doctorID = matrix[0][5].doctorID
 
   return matrix
   #sort so every user gets around the same number of spots
