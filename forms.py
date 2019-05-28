@@ -23,6 +23,9 @@ class UserForm(FlaskForm):
 	is_cardio = SelectField('Cardiologist?', choices=[('True', 'Yes'), ('False', 'No')])	
 	is_admin = SelectField('Administrator? (can add/remove users)', choices=[('False', 'No'), ('True', 'Yes')])
 
+class EmailForm(FlaskForm):
+	email = StringField('Enter your email: ', [validators.DataRequired(message='Please Enter Something')])
+
 class DeleteForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name')

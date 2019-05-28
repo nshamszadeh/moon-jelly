@@ -2,7 +2,7 @@ import os
 import subprocess
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -283,6 +283,19 @@ def login():
       form.email.errors.append('Invalid Email!')
   return render_template('login.html', form=form)
 
+@app.route('/reset_password', methods = ['GET', 'POST'])
+def reset_password():
+  form = EmailForm()
+  if request.method == 'POST' and form.validate():
+    user = User.query.filter_by(email=form.email.data).first()
+    if user:
+      send_password_email(user)
+      flash('An email should be sent shortly.')
+    else:
+      flash('Email address not recognized.')
+  else:
+    print('something isnt riiight')
+  return render_template('reset_password.html', form = form)
 
 
 @app.route('/register', methods = ['GET', 'POST'])
@@ -338,7 +351,6 @@ def send_password_email(user):
 {url_for('set_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-
     mail.send(msg)
 
 @app.route('/add', methods = ['GET', 'POST'])
@@ -393,6 +405,7 @@ def add():
 @app.route("/set_password/<token>", methods=['GET', 'POST'])
 def set_token(token):
   if current_user.is_authenticated:
+    flash("You must first log out!")
     return redirect(url_for('logged_in_homepage'))
   user = User.verify_reset_token(token)
   if user is None:
@@ -441,8 +454,10 @@ def about():
   except:
     message = "Sorry, we coundn't run that command..."
   #dir:command you want to run(name)
-  return render_template('about.html', message=message)
-
+  if not current_user.is_authenticated: # if not logged in
+    return render_template('about.html', message=message)
+  else:
+    return render_template('logged_about.html')
 
 
 @app.route('/profile')
@@ -465,6 +480,7 @@ def contact():
 
 #test to print out the first names of users 
 @app.route('/users')
+@login_required
 def users():
   u = User.query.all()
   utable = UserTable(u)
@@ -699,7 +715,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
 
 
 @app.route('/schedule')
-@login_required
 def schedule():
   s = slots.query.all()
   grid = []
