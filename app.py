@@ -14,6 +14,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from io import StringIO
 from xhtml2pdf import pisa
 
+
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -23,6 +24,8 @@ import pdfkit
 
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
+from flask import Flask, render_template, redirect, url_for
+#from flask_mail import Mail, Message
 
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
@@ -32,6 +35,8 @@ from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
+#mail = Mail(app)
+
 
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -41,10 +46,12 @@ app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for 
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
+
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
@@ -317,31 +324,23 @@ def load_user(user_id):
 # wtf does this do
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
-'''
-class Pdf():
-
-    def render_pdf(self, name, html):
-
-        pdf = StringIO()
-
-        pisa.CreatePDF(StringIO(html), pdf)
-
-        return pdf.getvalue()
 
 
-@app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
-def view_invoice(business_name, tin):
+@app.route('/<name>/<location>')
+def Schedule(name,location):
+  rendered=render_template('schedule.html', name=name, Location=location)
 
-    #pdf = StringIO()
-    html = render_template(
-        'schedule.html', business_name=business_name, tin=tin)
-    file_class = Pdf()
-    pdf = file_class.render_pdf(business_name, html)
-    headers = {
-        'content-type': 'application.pdf',
-        'content-disposition': 'attachment; filename=certificate.pdf'}
-    return pdf, 200, headers
-'''
+  
+  css=['img/style.css']
+  pdf=pdfkit.from_string(rendered,False,css=css)
+
+  response=make_response(pdf)
+  response.headers['Content-Type']='application/pdf'
+  response.headers['Content-Disposition']='attachment; filename=output.pdf'
+  
+  return response
+  
+  #return render_template('Certificate.html')
 
 @app.route('/')
 def homepage():
@@ -1119,6 +1118,7 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
+#pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
 
 
 if __name__ == '__main__':
