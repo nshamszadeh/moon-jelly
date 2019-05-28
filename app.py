@@ -983,11 +983,11 @@ def make2():
   print("SchedForm.errors = ", SchedForm.errors)
   #print("Su1 = ",Su1)
   
-  s = slots.query.all()
-  grid = []
-  for i in range(0, len(s), 7):
-   grid.append(s[i:i+7])
-  return render_template('make2.html', matrix = grid, schedForm = SchedForm)
+  # s = slots.query.all()
+  # grid = []
+  # for i in range(0, len(s), 7):
+  #  grid.append(s[i:i+7])
+  return render_template('make2.html',schedForm = SchedForm)
 
 
 class slots(db.Model):
@@ -1105,12 +1105,12 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
 
 @app.route('/schedule')
 def schedule():
-  # s = slots.query.all()
-  # grid = []
-  # for i in range(0, len(s), 7):
-  #  grid.append(s[i:i+7])
-  # return render_template('schedule.html', matrix = grid)
-  return render_template('schedule.html')
+  s = slots.query.all()
+  grid = []
+  for i in range(0, len(s), 7):
+   grid.append(s[i:i+7])
+  return render_template('schedule.html', matrix = grid)
+  # return render_template('schedule.html')
   
 
 @app.route("/logout")

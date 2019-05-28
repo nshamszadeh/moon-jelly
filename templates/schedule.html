@@ -3,14 +3,89 @@
 {% block body %}
 
 <div id="schedule">
+
 <div class="container-fluid padding">
 <div class="row welcome text-center">
   <div class="col-12">
-    <h1 class="display-7">Schedule</h1>
+    <h1 class="display-7">Schedule for Week 1</h1>
   </div>
+  <hr>
 </div>
 </div>
+<table class="table table-bordered table-hover">
+  <thead class="table-primary">
+    <tr>
+      <th scope="col">Pos\Day</th>
+      <th scope="col">Monday</th>
+      <th scope="col">Tuesday</th>
+      <th scope="col">Wednesday</th>
+      <th scope="col">Thursday</th>
+      <th scope="col">Friday</th>
+      <th scope="col">Saturday</th>
+      <th scope="col">Sunday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1st AM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix[0][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">1st PM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix[1][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">2nd Call</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix[2][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">3rd Call</th>
+      {%for i in range(5)%}
+       <td>{{matrix[3][i].doctor.first_name}}</td>
+      {%endfor%}       
+      <td class="table-info">{{matrix[3][5].doctor.first_name}}</td>
+      <td class="table-info">{{matrix[3][6].doctor.first_name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">4th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix[4][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">5th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix[5][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">6th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix[6][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">7th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix[7][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">Post Call</th>
+      {%for i in range(7)%}
+       <td class="table-success">{{matrix[8][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+  </tbody>
+</table>
 
+<!-- <div class="container">
 <div class="row">
   <div class="col">
     Pos\Day
@@ -38,6 +113,24 @@
   </div>
 </div>
 
+{%for i in range(9)%}
+ <div class="row">
+  <div class="col">
+    Pos#{{i}}
+  </div>
+  {%for slot in matrix[i]%}
+    <div class="col">
+      {{slot.doctor.first_name}}
+    </div>
+  {%endfor%}
+ </div>
+{%endfor%}
+</div>
+<br>
+<br>
+
+
+
 {%for row in matrix%}
 <div class="row">
   <div class="col">
@@ -50,8 +143,119 @@
   {%endfor%}
 </div>
 {%endfor%}
+</div>
+
+
+
+
+
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+    <h1 class="display-7">Schedule for Week 2</h1>
+  </div>
+  <hr>
+</div>
+</div>
+<div class="container">
+<div class="row">
+  <div class="col">
+    Pos\Day
+  </div>
+  <div class="col">
+    Monday
+  </div>
+  <div class="col">
+    Tuesday
+  </div>
+  <div class="col">
+    Wednesday
+  </div>
+  <div class="col">
+    Thursday
+  </div>
+  <div class="col">
+    Friday
+  </div>
+  <div class="col">
+    Saturday
+  </div>
+  <div class="col">
+    Sunday
+  </div>
+</div>
+
+{%for i in range(9,18)%}
+ <div class="row">
+  <div class="col">
+    Pos#{{i-9}}
+  </div>
+  {%for slot in matrix[i]%}
+    <div class="col">
+      {{slot.doctor.first_name}}
+    </div>
+  {%endfor%}
+ </div>
+{%endfor%}
+</div>
+<br>
+<br>
+
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+    <h1 class="display-7">Schedule for Week 3</h1>
+  </div>
+  <hr>
+</div>
+</div>
+<div class="container">
+<div class="row">
+  <div class="col">
+    Pos\Day
+  </div>
+  <div class="col">
+    Monday
+  </div>
+  <div class="col">
+    Tuesday
+  </div>
+  <div class="col">
+    Wednesday
+  </div>
+  <div class="col">
+    Thursday
+  </div>
+  <div class="col">
+    Friday
+  </div>
+  <div class="col">
+    Saturday
+  </div>
+  <div class="col">
+    Sunday
+  </div>
+</div>
+
+{%for i in range(18,27)%}
+ <div class="row">
+  <div class="col">
+    Pos#{{i-18}}
+  </div>
+  {%for slot in matrix[i]%}
+    <div class="col">
+      {{slot.doctor.first_name}}
+    </div>
+  {%endfor%}
+ </div>
+{%endfor%}
+</div>
+<br>
+<br>
+
 
 </div>
+ -->
 
 <!-- <table style="width:100%">
 

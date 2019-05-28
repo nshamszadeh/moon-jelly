@@ -90,9 +90,22 @@ hr.light {
   margin-bottom: 1rem;
 }
 
+td, th {
+  text-align: center;
 
+}
+th {
+  background: #99caff;
+  height: 150%;
+}
 
+.table-info {
+  background: #dcf1f4;
+}
 
+.table-success {
+  background: #b2e8d5;
+}
 /*---Media Queries --*/
 @media (max-width: 992px) {
 
