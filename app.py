@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-#import StringIO
+#import cStringIO
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -19,10 +19,12 @@ from flask import Flask, request, jsonify
 import pdfkit 
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
+from flask import Flask, render_template, redirect, url_for
+#from flask_mail import Mail, Message
 
 
 app = Flask(__name__)
-
+#mail = Mail(app)
 
 
 
@@ -206,18 +208,24 @@ def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
 # This is the main homepage for now. GET and POST are for web forms
-'''
+
 @app.route('/<name>/<location>')
-def pdf_template(name,location):
-  rendered=render_template('pdf_template.html',name=name,location=location)
-  pdf=pdfkit.from_string(rendered,False)
+def Schedule(name,location):
+  rendered=render_template('schedule.html', name=name, Location=location)
+
+  
+  css=['img/style.css']
+  pdf=pdfkit.from_string(rendered,False,css=css)
 
   response=make_response(pdf)
-  respons.headers['Content-Type']='application/pdf'
-  response.headers['Content-Disposition']='inline; filename=output.pdf'
-
+  response.headers['Content-Type']='application/pdf'
+  response.headers['Content-Disposition']='attachment; filename=output.pdf'
+  
   return response
-'''
+  
+  #return render_template('Certificate.html')
+  
+
 
 @app.route('/add', methods = ['GET', 'POST'])
 
@@ -245,13 +253,14 @@ def add():
   # add html file here
   return render_template('add.html', form = user_form)
 
+
 '''
 class Pdf():
 
     def render_pdf(self, name, html):
 
         from xhtml2pdf import pisa
-        from StringIO import StringIO
+        from cStringIO import StringIO
 
         pdf = StringIO()
 
@@ -265,15 +274,15 @@ def view_invoice(business_name, tin):
 
     #pdf = StringIO()
     html = render_template(
-        'schedule.html', business_name=business_name, tin=tin)
+        'Certificate.html', business_name=business_name, tin=tin)
     file_class = Pdf()
     pdf = file_class.render_pdf(business_name, html)
     headers = {
         'content-type': 'application.pdf',
         'content-disposition': 'attachment; filename=certificate.pdf'}
     return pdf, 200, headers
-'''
 
+'''
 
 @app.route('/')
 def homepage():
@@ -660,7 +669,7 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
-pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
+#pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
 
 
 if __name__ == '__main__':
