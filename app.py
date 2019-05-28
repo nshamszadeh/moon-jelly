@@ -11,10 +11,19 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
+from io import StringIO
+from xhtml2pdf import pisa
+
+import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
+#import flask_excel as excel
+
+import pdfkit 
+
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
+
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -122,25 +131,78 @@ class Number_Users(db.Model):
 
   
   id = db.Column(db.Integer, primary_key=True)
-  number_usersSu = db.Column(db.Integer)
-  number_usersM = db.Column(db.Integer)
-  number_usersT = db.Column(db.Integer)
-  number_usersW = db.Column(db.Integer)
-  number_usersTh = db.Column(db.Integer)
-  number_usersF = db.Column(db.Integer)
-  number_usersS = db.Column(db.Integer)
+  number_usersSu1 = db.Column(db.Integer)
+  number_usersM1 = db.Column(db.Integer)
+  number_usersT1 = db.Column(db.Integer)
+  number_usersW1 = db.Column(db.Integer)
+  number_usersTh1 = db.Column(db.Integer)
+  number_usersF1 = db.Column(db.Integer)
+  number_usersS1 = db.Column(db.Integer)
+  
+  number_usersSu2 = db.Column(db.Integer)
+  number_usersM2 = db.Column(db.Integer)
+  number_usersT2 = db.Column(db.Integer)
+  number_usersW2 = db.Column(db.Integer)
+  number_usersTh2 = db.Column(db.Integer)
+  number_usersF2 = db.Column(db.Integer)
+  number_usersS2 = db.Column(db.Integer)
+
+  number_usersSu3 = db.Column(db.Integer)
+  number_usersM3 = db.Column(db.Integer)
+  number_usersT3 = db.Column(db.Integer)
+  number_usersW3 = db.Column(db.Integer)
+  number_usersTh3 = db.Column(db.Integer)
+  number_usersF3 = db.Column(db.Integer)
+  number_usersS3 = db.Column(db.Integer)
   #is_current = dbColumn(db.Boolean)
 
   # initialize the object
-  def __init__(self, number_usersSu, number_usersM, number_usersT, number_usersW, number_usersTh, number_usersF, number_usersS):
-    self.number_usersSu = number_usersSu
-    self.number_usersM = number_usersM
-    self.number_usersT = number_usersT
-    self.number_usersW = number_usersW
-    self.number_usersTh = number_usersTh
-    self.number_usersF = number_usersF
-    self.number_usersS = number_usersS
+  def __init__(self, number_usersSu1, 
+                number_usersM1, 
+                number_usersT1, 
+                number_usersW1, 
+                number_usersTh1, 
+                number_usersF1, 
+                number_usersS1,
+                number_usersSu2,
+                number_usersM2, 
+                number_usersT2, 
+                number_usersW2, 
+                number_usersTh2, 
+                number_usersF2, 
+                number_usersS2,
+                number_usersSu3,
+                number_usersM3, 
+                number_usersT3, 
+                number_usersW3, 
+                number_usersTh3, 
+                number_usersF3, 
+                number_usersS3):
+    self.number_usersSu1 = number_usersSu1
+    self.number_usersM1 = number_usersM1
+    self.number_usersT1 = number_usersT1
+    self.number_usersW1 = number_usersW1
+    self.number_usersTh1 = number_usersTh1
+    self.number_usersF1 = number_usersF1
+    self.number_usersS1 = number_usersS1
+
+    self.number_usersSu2 = number_usersSu2
+    self.number_usersM2 = number_usersM2
+    self.number_usersT2 = number_usersT2
+    self.number_usersW2 = number_usersW2
+    self.number_usersTh2 = number_usersTh2
+    self.number_usersF2 = number_usersF2
+    self.number_usersS2 = number_usersS2
+
+    self.number_usersSu3 = number_usersSu3
+    self.number_usersM3 = number_usersM3
+    self.number_usersT3 = number_usersT3
+    self.number_usersW3 = number_usersW3
+    self.number_usersTh3 = number_usersTh3
+    self.number_usersF3 = number_usersF3
+    self.number_usersS3 = number_usersS3
     #self.is_current = True
+
 
 class Users_That_Day(db.Model):
 
@@ -155,10 +217,26 @@ class Users_That_Day(db.Model):
   Th1 = db.Column(ARRAY(db.Integer))
   F1 = db.Column(ARRAY(db.Integer))
   S1 = db.Column(ARRAY(db.Integer))
+
+  Su2 = db.Column(ARRAY(db.Integer))
+  M2 = db.Column(ARRAY(db.Integer))
+  T2 = db.Column(ARRAY(db.Integer))
+  W2 = db.Column(ARRAY(db.Integer))
+  Th2 = db.Column(ARRAY(db.Integer))
+  F2 = db.Column(ARRAY(db.Integer))
+  S2 = db.Column(ARRAY(db.Integer))
+
+  Su3 = db.Column(ARRAY(db.Integer))
+  M3 = db.Column(ARRAY(db.Integer))
+  T3 = db.Column(ARRAY(db.Integer))
+  W3 = db.Column(ARRAY(db.Integer))
+  Th3 = db.Column(ARRAY(db.Integer))
+  F3 = db.Column(ARRAY(db.Integer))
+  S3 = db.Column(ARRAY(db.Integer))
   #is_current = dbColumn(db.Boolean)
 
   # initialize the object
-  def __init__(self, Su1, M1, T1, W1, Th1, F1, S1):
+  def __init__(self, Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2, Su3, M3, T3, W3, Th3, F3, S3):
     self.Su1 = Su1
     self.M1 = M1
     self.T1 = T1
@@ -166,6 +244,22 @@ class Users_That_Day(db.Model):
     self.Th1 = Th1
     self.F1 = F1
     self.S1 = S1
+
+    self.Su2 = Su2
+    self.M2 = M2
+    self.T2 = T2
+    self.W2 = W2
+    self.Th2 = Th2
+    self.F2 = F2
+    self.S2 = S2
+
+    self.Su3 = Su3
+    self.M3 = M3
+    self.T3 = T3
+    self.W3 = W3
+    self.Th3 = Th3
+    self.F3 = F3
+    self.S3 = S3
     #self.is_current = True
 
 
@@ -227,9 +321,6 @@ def Mbox(title, text, style):
 class Pdf():
 
     def render_pdf(self, name, html):
-
-        from xhtml2pdf import pisa
-        from StringIO import StringIO
 
         pdf = StringIO()
 
@@ -501,54 +592,127 @@ def make():
 
   if request.method == 'POST':
 
-    if(request.form['NumberUsersM'].isdigit()):
-      number_usersM = int(request.form['NumberUsersM'])
+    if(request.form['NumberUsersSu1'].isdigit()):
+      number_usersSu1 = int(request.form['NumberUsersSu1'])
 
-    if(request.form['NumberUsersT'].isdigit()):
-      number_usersT = int(request.form['NumberUsersT'])
-    
-    if(request.form['NumberUsersW'].isdigit()):
-     number_usersW = int(request.form['NumberUsersW'])
-    
-    if(request.form['NumberUsersTh'].isdigit()):
-     number_usersTh = int(request.form['NumberUsersTh'])
-    
-    if(request.form['NumberUsersF'].isdigit()):
-      number_usersF = int(request.form['NumberUsersF'])
-    
-    if(request.form['NumberUsersS'].isdigit()):
-     number_usersS = int(request.form['NumberUsersS'])
-    
-    if(request.form['NumberUsersSu'].isdigit()):
-      number_usersSu = int(request.form['NumberUsersSu'])
-   
+    if(request.form['NumberUsersM1'].isdigit()):
+      number_usersM1 = int(request.form['NumberUsersM1'])
 
+    if(request.form['NumberUsersT1'].isdigit()):
+      number_usersT1 = int(request.form['NumberUsersT1'])
+    
+    if(request.form['NumberUsersW1'].isdigit()):
+     number_usersW1 = int(request.form['NumberUsersW1'])
+    
+    if(request.form['NumberUsersTh1'].isdigit()):
+     number_usersTh1 = int(request.form['NumberUsersTh1'])
+    
+    if(request.form['NumberUsersF1'].isdigit()):
+      number_usersF1 = int(request.form['NumberUsersF1'])
+    
+    if(request.form['NumberUsersS1'].isdigit()):
+     number_usersS1 = int(request.form['NumberUsersS1'])
+
+
+    if(request.form['NumberUsersSu2'].isdigit()):
+      number_usersSu2 = int(request.form['NumberUsersSu2'])
+
+    if(request.form['NumberUsersM2'].isdigit()):
+      number_usersM2 = int(request.form['NumberUsersM2'])
+
+    if(request.form['NumberUsersT2'].isdigit()):
+      number_usersT2 = int(request.form['NumberUsersT2'])
+    
+    if(request.form['NumberUsersW2'].isdigit()):
+     number_usersW2 = int(request.form['NumberUsersW2'])
+    
+    if(request.form['NumberUsersTh2'].isdigit()):
+     number_usersTh2 = int(request.form['NumberUsersTh2'])
+    
+    if(request.form['NumberUsersF2'].isdigit()):
+      number_usersF2 = int(request.form['NumberUsersF2'])
+    
+    if(request.form['NumberUsersS2'].isdigit()):
+     number_usersS2 = int(request.form['NumberUsersS2'])
+
+
+    if(request.form['NumberUsersSu3'].isdigit()):
+      number_usersSu3 = int(request.form['NumberUsersSu3'])
+
+    if(request.form['NumberUsersM3'].isdigit()):
+      number_usersM3 = int(request.form['NumberUsersM3'])
+
+    if(request.form['NumberUsersT3'].isdigit()):
+      number_usersT3 = int(request.form['NumberUsersT3'])
+    
+    if(request.form['NumberUsersW3'].isdigit()):
+     number_usersW3 = int(request.form['NumberUsersW3'])
+    
+    if(request.form['NumberUsersTh3'].isdigit()):
+     number_usersTh3 = int(request.form['NumberUsersTh3'])
+    
+    if(request.form['NumberUsersF3'].isdigit()):
+      number_usersF3 = int(request.form['NumberUsersF3'])
+    
+    if(request.form['NumberUsersS3'].isdigit()):
+     number_usersS3 = int(request.form['NumberUsersS3'])
+
+
+       
     if numuForm.validate(): 
-      new_number_users = Number_Users(number_usersSu, 
-                                      number_usersM, 
-                                      number_usersT, 
-                                      number_usersW, 
-                                      number_usersTh, 
-                                      number_usersF, 
-                                      number_usersS)
+      new_number_users = Number_Users(number_usersSu1, 
+                                      number_usersM1, 
+                                      number_usersT1, 
+                                      number_usersW1, 
+                                      number_usersTh1, 
+                                      number_usersF1, 
+                                      number_usersS1,
+                                      number_usersSu2, 
+                                      number_usersM2, 
+                                      number_usersT2, 
+                                      number_usersW2, 
+                                      number_usersTh2, 
+                                      number_usersF2, 
+                                      number_usersS2,
+                                      number_usersSu3, 
+                                      number_usersM3, 
+                                      number_usersT3, 
+                                      number_usersW3, 
+                                      number_usersTh3, 
+                                      number_usersF3, 
+                                      number_usersS3)
       db.session.add(new_number_users)
       db.session.commit()
-
       return redirect('/make2')
   return render_template('make.html', numuForm = numuForm)
 
 @app.route('/make2', methods=['GET', 'POST'])
 def make2():
 
-  #global variables for making schedule
-
   Su1 = []
-  M1= []
+  M1 = []
   T1 = []
   W1 = []
   Th1 = []
   F1 = []
   S1 = []
+
+  Su2 = []
+  M2 = []
+  T2 = []
+  W2 = []
+  Th2 = []
+  F2 = []
+  S2 = []
+
+  Su3 = []
+  M3 = []
+  T3 = []
+  W3 = []
+  Th3 = []
+  F3 = []
+  S3 = []
+
 
   Su1_id = []
   M1_id = []
@@ -558,38 +722,86 @@ def make2():
   F1_id = []
   S1_id = []
 
+  Su2_id = []
+  M2_id = []
+  T2_id = []
+  W2_id = []
+  Th2_id = []
+  F2_id = []
+  S2_id = []
+
+  Su3_id = []
+  M3_id = []
+  T3_id = []
+  W3_id = []
+  Th3_id = []
+  F3_id = []
+  S3_id = []
 
   NU = Number_Users.query.all()
 
-  userfirstNamesSu = ["first_name"]*NU[-1].number_usersSu
-  userfirstNamesM = ["first_name"]*NU[-1].number_usersM
-  userfirstNamesT = ["first_name"]*NU[-1].number_usersT
-  userfirstNamesW = ["first_name"]*NU[-1].number_usersW
-  userfirstNamesTh = ["first_name"]*NU[-1].number_usersTh
-  userfirstNamesF = ["first_name"]*NU[-1].number_usersF
-  userfirstNamesS = ["first_name"]*NU[-1].number_usersS
+  userfirstNamesSu1 = ["first_name"]*NU[-1].number_usersSu1
+  userfirstNamesM1 = ["first_name"]*NU[-1].number_usersM1
+  userfirstNamesT1 = ["first_name"]*NU[-1].number_usersT1
+  userfirstNamesW1 = ["first_name"]*NU[-1].number_usersW1
+  userfirstNamesTh1 = ["first_name"]*NU[-1].number_usersTh1
+  userfirstNamesF1 = ["first_name"]*NU[-1].number_usersF1
+  userfirstNamesS1 = ["first_name"]*NU[-1].number_usersS1
+
+  userfirstNamesSu2 = ["first_name"]*NU[-1].number_usersSu2
+  userfirstNamesM2 = ["first_name"]*NU[-1].number_usersM2
+  userfirstNamesT2 = ["first_name"]*NU[-1].number_usersT2
+  userfirstNamesW2 = ["first_name"]*NU[-1].number_usersW2
+  userfirstNamesTh2 = ["first_name"]*NU[-1].number_usersTh2
+  userfirstNamesF2 = ["first_name"]*NU[-1].number_usersF2
+  userfirstNamesS2 = ["first_name"]*NU[-1].number_usersS2
+
+  userfirstNamesSu3 = ["first_name"]*NU[-1].number_usersSu3
+  userfirstNamesM3 = ["first_name"]*NU[-1].number_usersM3
+  userfirstNamesT3 = ["first_name"]*NU[-1].number_usersT3
+  userfirstNamesW3 = ["first_name"]*NU[-1].number_usersW3
+  userfirstNamesTh3 = ["first_name"]*NU[-1].number_usersTh3
+  userfirstNamesF3 = ["first_name"]*NU[-1].number_usersF3
+  userfirstNamesS3 = ["first_name"]*NU[-1].number_usersS3
+
   SchedForm = ScheduleForm(request.form,
-                           userfirstNamesSu=userfirstNamesSu,
-                           userfirstNamesM=userfirstNamesM,
-                           userfirstNamesT=userfirstNamesT,
-                           userfirstNamesW=userfirstNamesW,
-                           userfirstNamesTh=userfirstNamesTh,
-                           userfirstNamesF=userfirstNamesF,
-                           userfirstNamesS=userfirstNamesS)
+                           userfirstNamesSu1=userfirstNamesSu1,
+                           userfirstNamesM1=userfirstNamesM1,
+                           userfirstNamesT1=userfirstNamesT1,
+                           userfirstNamesW1=userfirstNamesW1,
+                           userfirstNamesTh1=userfirstNamesTh1,
+                           userfirstNamesF1=userfirstNamesF1,
+                           userfirstNamesS1=userfirstNamesS1,
+                           userfirstNamesSu2=userfirstNamesSu2,
+                           userfirstNamesM2=userfirstNamesM2,
+                           userfirstNamesT2=userfirstNamesT2,
+                           userfirstNamesW2=userfirstNamesW2,
+                           userfirstNamesTh2=userfirstNamesTh2,
+                           userfirstNamesF2=userfirstNamesF2,
+                           userfirstNamesS2=userfirstNamesS2,
+                           userfirstNamesSu3=userfirstNamesSu3,
+                           userfirstNamesM3=userfirstNamesM3,
+                           userfirstNamesT3=userfirstNamesT3,
+                           userfirstNamesW3=userfirstNamesW3,
+                           userfirstNamesTh3=userfirstNamesTh3,
+                           userfirstNamesF3=userfirstNamesF3,
+                           userfirstNamesS3=userfirstNamesS3)
   
 
 
   if request.method == 'POST':
     
-    for entry in SchedForm.userfirstNamesSu.entries:
+    for entry in SchedForm.userfirstNamesSu1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         Su1_id.append(U1.id)
-        M1.append(U1)
+
+        Su1.append(U1) #bug here, said M1.append(U1)
+
       else:
         print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesM.entries:
+    for entry in SchedForm.userfirstNamesM1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         M1_id.append(U1.id)
@@ -597,7 +809,7 @@ def make2():
       else:
         print("not a valid first name")
     
-    for entry in SchedForm.userfirstNamesT.entries:
+    for entry in SchedForm.userfirstNamesT1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         T1_id.append(U1.id)
@@ -605,7 +817,7 @@ def make2():
       else:
         print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesW.entries:
+    for entry in SchedForm.userfirstNamesW1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         W1_id.append(U1.id)
@@ -613,7 +825,7 @@ def make2():
       else:
         print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesTh.entries:
+    for entry in SchedForm.userfirstNamesTh1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         Th1_id.append(U1.id)
@@ -621,7 +833,7 @@ def make2():
       else:
         print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesF.entries:
+    for entry in SchedForm.userfirstNamesF1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         F1_id.append(U1.id)
@@ -629,7 +841,7 @@ def make2():
       else:
         print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesS.entries:
+    for entry in SchedForm.userfirstNamesS1.entries:
       if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
         U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
         S1_id.append(U1.id)
@@ -637,8 +849,126 @@ def make2():
       else:
         print("not a valid first name")
 
+
+
+    for entry in SchedForm.userfirstNamesSu2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Su2_id.append(U1.id)
+        Su2.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesM2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        M2_id.append(U1.id)
+        M2.append(U1)
+      else:
+        print("not a valid first name")
+    
+    for entry in SchedForm.userfirstNamesT2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        T2_id.append(U1.id)
+        T2.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesW2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        W2_id.append(U1.id)
+        W2.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesTh2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Th2_id.append(U1.id)
+        Th2.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesF2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        F2_id.append(U1.id)
+        F2.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesS2.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        S2_id.append(U1.id)
+        S2.append(U1)
+      else:
+        print("not a valid first name")
+
+
+
+
+    for entry in SchedForm.userfirstNamesSu3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Su3_id.append(U1.id)
+        Su3.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesM3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        M3_id.append(U1.id)
+        M3.append(U1)
+      else:
+        print("not a valid first name")
+    
+    for entry in SchedForm.userfirstNamesT3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        T3_id.append(U1.id)
+        T3.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesW3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        W3_id.append(U1.id)
+        W3.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesTh3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        Th3_id.append(U1.id)
+        Th3.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesF3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        F3_id.append(U1.id)
+        F3.append(U1)
+      else:
+        print("not a valid first name")
+
+    for entry in SchedForm.userfirstNamesS3.entries:
+      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+        S3_id.append(U1.id)
+        S3.append(U1)
+      else:
+        print("not a valid first name")
+
+
     if SchedForm.validate(): 
-      new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id)
+      new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id, Su2_id, M2_id, T2_id, W2_id, Th2_id, F2_id, S2_id, Su3_id, M3_id, T3_id, W3_id, Th3_id, F3_id, S3_id)
       db.session.add(new_users_that_day) # add to database
 
       matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1)    
@@ -652,8 +982,12 @@ def make2():
   
   print("SchedForm.errors = ", SchedForm.errors)
   #print("Su1 = ",Su1)
-
-  return render_template('make2.html', schedForm = SchedForm)
+  
+  s = slots.query.all()
+  grid = []
+  for i in range(0, len(s), 7):
+   grid.append(s[i:i+7])
+  return render_template('make2.html', matrix = grid, schedForm = SchedForm)
 
 
 class slots(db.Model):
@@ -686,26 +1020,81 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
    for j in range(0,7):
     matrix[i][j] = slots(j + 1, i + 1, doctorID = None)
 
+  k = 1
+  filled = False
   for i in range(0,len(M1)):
-   matrix[i][0].doctorID = M1[i].id
-
+   if M1[i].is_cardio is True and filled is False:
+    matrix[0][0].doctorID = M1[i].id
+    filled = True
+   else:
+    matrix[k][0].doctorID = M1[i].id
+    k += 1
+  
+  k = 1
+  filled = False
   for i in range(0,len(T1)):
-   matrix[i][1].doctorID = T1[i].id
+   if T1[i].is_cardio is True and filled is False:
+    matrix[0][1].doctorID = T1[i].id
+    filled = True
+   else:
+    matrix[k][1].doctorID = T1[i].id
+    k += 1
+   matrix[8][1].doctorID = matrix[0][0].doctorID
 
+  k = 1
+  filled = False
   for i in range(0,len(W1)):
-   matrix[i][2].doctorID = W1[i].id
+   if W1[i].is_cardio is True and filled is False:
+    matrix[0][2].doctorID = W1[i].id
+    filled = True
+   else:
+    matrix[k][2].doctorID = W1[i].id
+    k += 1
+   matrix[8][2].doctorID = matrix[0][1].doctorID
 
+  k = 1
+  filled = False
   for i in range(0,len(Th1)):
-   matrix[i][3].doctorID = Th1[i].id
+   if Th1[i].is_cardio is True and filled is False:
+    matrix[0][3].doctorID = Th1[i].id
+    filled = True
+   else:
+    matrix[k][3].doctorID = Th1[i].id
+    k += 1
+   matrix[8][3].doctorID = matrix[0][2].doctorID
 
+  k = 1
+  filled = False
   for i in range(0,len(F1)):
-   matrix[i][4].doctorID = F1[i].id
+   if F1[i].is_cardio is True and filled is False:
+    matrix[0][4].doctorID = F1[i].id
+    filled = True
+   else:
+    matrix[k][4].doctorID = F1[i].id
+    k += 1
+   matrix[8][4].doctorID = matrix[0][3].doctorID
 
+  k = 1
+  filled = False
   for i in range(0,len(S1)):
-   matrix[i][5].doctorID = S1[i].id
+   if S1[i].is_cardio is True and filled is False:
+    matrix[0][5].doctorID = S1[i].id
+    filled = True
+   else:
+    matrix[k][5].doctorID = S1[i].id
+    k += 1
+   matrix[8][5].doctorID = matrix[0][4].doctorID
 
+  k = 1
+  filled = False
   for i in range(0,len(Su1)):
-   matrix[i][6].doctorID = Su1[i].id
+   if Su1[i].is_cardio is True and filled is False:
+    matrix[0][6].doctorID = Su1[i].id
+    filled = True
+   else:
+    matrix[k][6].doctorID = Su1[i].id
+    k += 1
+   matrix[8][6].doctorID = matrix[0][5].doctorID
 
   return matrix
   #sort so every user gets around the same number of spots
@@ -716,11 +1105,12 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
 
 @app.route('/schedule')
 def schedule():
-  s = slots.query.all()
-  grid = []
-  for i in range(0, len(s), 7):
-   grid.append(s[i:i+7])
-  return render_template('schedule.html', matrix = grid)
+  # s = slots.query.all()
+  # grid = []
+  # for i in range(0, len(s), 7):
+  #  grid.append(s[i:i+7])
+  # return render_template('schedule.html', matrix = grid)
+  return render_template('schedule.html')
   
 
 @app.route("/logout")
