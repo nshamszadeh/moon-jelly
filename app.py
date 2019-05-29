@@ -1236,7 +1236,7 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
 def min_val(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users
   min_val = None
 
-  print("parameter = " , parameter)
+  #print("parameter = " , parameter)
 
   userlist = [] 
   for i in range(0,len(inputlist)):
