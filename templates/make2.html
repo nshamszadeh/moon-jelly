@@ -1,184 +1,254 @@
-{% extends 'layout.html' %}
+{% extends 'layout2.html' %}
+
 {% block body %}
+
+<head>
+<style>
+body {background-color: powderblue;}
+input {width: 100%;}
+label {display: none;}
+</style>
+</head>
+
+
+<div id="schedule">
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+    <h1 class="display-7">who is working each day?</h1>
+  </div>
+</div>
+</div>
+
+<div class="row">
+ <div class="col">
+    Week #
+ </div>
+  <div class="col">
+    Monday
+  </div>
+  <div class="col">
+    Tuesday
+  </div>
+  <div class="col">
+    Wednesday
+  </div>
+  <div class="col">
+    Thursday
+  </div>
+  <div class="col">
+    Friday
+  </div>
+  <div class="col">
+    Saturday
+  </div>
+  <div class="col">
+    Sunday
+  </div>
+</div>
+
 <form action="" method="POST">
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
-            {{Schedule_Entry_Form}}
-            {{ schedForm.csrf_token() }}
-            </p>
-            {% endfor %}
-        
+  <div class="row">
+    <div class="col">
+        Week 1
+    </div>
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
-       
+            </div>
+
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS1%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
 
-
-
-
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="col">
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu1%}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            {{ schedForm.csrf_token() }}
-            </p>
+            </div>
             {% endfor %}
+            </div>
+
+        </div>
+
+
+<hr>
+
+         <div class="row">
+           <div class="col">      
+            Week 2
+           </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
+        
        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS2%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
 
-
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="col">
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu2%}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            {{ schedForm.csrf_token() }}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
+        </div>
+
+<hr>
+        <div class="row">
+            <div class="col">      
+            Week 3
+           </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
-       
+            </div>
+        
+             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+        
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
         
+            <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS3%}
-            <p>
-            {{ Schedule_Entry_Form.hidden_tag() }}
-            {{Schedule_Entry_Form.label}}
+            <div class="row">
             {{Schedule_Entry_Form}}
-            </p>
+            </div> 
             {% endfor %}
+            </div>
 
+            <div class="col">
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu3%}
+            <div class="row">
+            {{Schedule_Entry_Form}}
+            </div> 
+            {% endfor %}
+            </div>
+            
+        </div>
+    </div>
+{{ schedForm.csrf_token() }}
             <button>
                   Submit
             </button>
-        </form>
-
+        </form> 
+        <hr>
 {% endblock %}

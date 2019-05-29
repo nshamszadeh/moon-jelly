@@ -37,7 +37,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 app = Flask(__name__)
 #mail = Mail(app)
 
-'''
+
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -45,21 +45,25 @@ app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-'''
+
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
 
+
+
 mail = Mail(app)
+
+
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -82,15 +86,15 @@ class User(UserMixin, db.Model):
   is_cardio = db.Column(db.Boolean)
   initials = db.Column(db.Text)
   password = db.Column(db.Text)
-  # firstam = db.Column(db.Integer)
-  # firstpm = db.Column(db.Integer)
-  # second = db.Column(db.Integer)
-  # third = db.Column(db.Integer)
-  # forth = db.Column(db.Integer)
-  # fifth = db.Column(db.Integer)
-  # sixth = db.Column(db.Integer)
-  # seventh = db.Column(db.Integer)
-  # postcall = db.Column(db.Boolean)
+  firstam = db.Column(db.Integer)
+  firstpm = db.Column(db.Integer)
+  second = db.Column(db.Integer)
+  third = db.Column(db.Integer)
+  forth = db.Column(db.Integer)
+  fifth = db.Column(db.Integer)
+  sixth = db.Column(db.Integer)
+  seventh = db.Column(db.Integer)
+  postcall = db.Column(db.Boolean)
   
 
   #QI you're probably gonna need to add variables like the one below: 
@@ -120,15 +124,15 @@ class User(UserMixin, db.Model):
     self.is_cardio = is_cardio
     self.password = password 
 
-    # self.firstam = firstam
-    # self.firstpm = firstpm
-    # self.second = second
-    # self.third = third
-    # self.forth = forth
-    # self.fifth = fifth
-    # self.sixth = sixth
-    # self.seventh = seventh
-    # self.postcall = postcall
+    self.firstam = 0
+    self.firstpm = 0
+    self.second = 0
+    self.third = 0
+    self.forth = 0
+    self.fifth = 0
+    self.sixth = 0
+    self.seventh = 0
+    self.postcall = 0
 
     self.initials = first_name[0] + last_name[0]
 
@@ -270,7 +274,7 @@ class Users_That_Day(db.Model):
     #self.is_current = True
 
 
-#Qi use this one
+#Qi use this one ##CHANGE FITH
 class Day(db.Model):
 
   __tablename__ = "Days" ##what does this do?
@@ -305,6 +309,7 @@ class Day(db.Model):
     self.seventh = seventh
     self.PostCall = PostCall
 
+
 # database table
 class UserTable(Table):
     id = Col('Id')
@@ -315,6 +320,10 @@ class UserTable(Table):
     is_admin = Col('Administrator?')
     is_cardio = Col('Cardiologist?')
     password = Col('Password',show=False)
+    firstam = Col('firstam')
+    firstpm= Col('firstpm')
+    second = Col('second')
+    third = Col('thrid')
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -327,8 +336,14 @@ def Mbox(title, text, style):
 
 
 @app.route('/<name>/<location>')
-def Schedule(name,location):
-  rendered=render_template('users.html', name=name, Location=location)
+def PrintSchedule(name,location):
+  s = slots.query.all()
+
+  grid = []
+  for i in range(0, len(s), 7):
+     grid.append(s[i:i+7])
+
+  rendered=render_template('schedule.html', matrix=grid, name=name, Location=location)
 
   
   css=['img/style.css']
@@ -339,7 +354,7 @@ def Schedule(name,location):
   response.headers['Content-Disposition']='attachment; filename=output.pdf'
   
   return response
-  
+ 
   #return render_template('Certificate.html')
 
 @app.route('/')
@@ -373,7 +388,7 @@ def login():
       form.email.errors.append('Invalid Email!')
   return render_template('login.html', form=form)
 
-'''
+
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def reset_password():
   form = EmailForm()
@@ -387,7 +402,7 @@ def reset_password():
   else:
     print('something isnt riiight')
   return render_template('reset_password.html', form = form)
-'''
+
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -433,18 +448,19 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
-'''
+
+
 def send_password_email(user):
   token = user.get_reset_token()
   msg = Message('Set ur goddamn Password here',
                 sender='moonjelly323@gmail.com',
                 recipients=[user.email])
-#  msg.body = f''' #To set your password, visit the following link:
-#{url_for('set_token', token=token, _external=True)}
-#If you did not make this request then simply ignore this email and no changes will be made.
-''' 
-  mail.send(msg)
+  msg.body = f'''To set your password, visit the following link:
+{url_for('set_token', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
 '''
+  mail.send(msg)
+
 
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
@@ -474,7 +490,7 @@ def add():
         db.session.add(new_user) # add to database
         db.session.commit() # for some reason we also need to commit it otherwise it won't add
         send_password_email(new_user)
-        return redirect(url_for('homepage')) # go to homepage again 
+        return redirect(url_for('users')) # go to homepage again 
       else:
         print("alright this dont work")
         if is_cardio == 'True':
@@ -489,7 +505,7 @@ def add():
         db.session.add(new_user) # add to database
         db.session.commit() # for some reason we also need to commit it otherwise it won't add
         send_password_email(new_user)
-        return redirect(url_for('homepage')) # go to homepage again 
+        return redirect(url_for('users')) # go to homepage again 
     else:
       print(request.method)
   return render_template('add.html', form = user_form)
@@ -513,6 +529,7 @@ def set_token(token):
     flash('Your password has been updated! You are now able to log in', 'success')
     return redirect(url_for('login'))
   return render_template('set_password.html', form=form)
+
 
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
@@ -690,6 +707,12 @@ def make():
 
 @app.route('/make2', methods=['GET', 'POST'])
 def make2():
+
+  allslots = slots.query.all()
+  if allslots != []:
+    db.session.query(slots).delete()
+    db.session.commit()
+    #.slots.query().delete()
 
   Su1 = []
   M1 = []
@@ -973,10 +996,19 @@ def make2():
       new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id, Su2_id, M2_id, T2_id, W2_id, Th2_id, F2_id, S2_id, Su3_id, M3_id, T3_id, W3_id, Th3_id, F3_id, S3_id)
       db.session.add(new_users_that_day) # add to database
 
-      matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1)    
+
+      #sorter2(Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2) 
+      print("min_val(Su1, second) = ", min_val(Su1, 'second'))
+
+      matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None, None)    
       for row in matrix:
-       for slot in row:
-        db.session.add(slot)
+        for slot in row:
+          db.session.add(slot)
+
+      # matrix = sorter(Su2, M2, T2, W2, Th2, F2, S2)    
+      # for row in matrix:
+      #   for slot in row:
+      #     db.session.add(slot)
 
       db.session.commit()
       return(redirect('/schedule'))
@@ -985,11 +1017,12 @@ def make2():
   print("SchedForm.errors = ", SchedForm.errors)
   #print("Su1 = ",Su1)
   
-  s = slots.query.all()
-  grid = []
-  for i in range(0, len(s), 7):
-   grid.append(s[i:i+7])
-  return render_template('make2.html', matrix = grid, schedForm = SchedForm)
+  # s = slots.query.all()
+  # grid = []
+  # for i in range(0, len(s), 7):
+  #  grid.append(s[i:i+7])
+
+  return render_template('make2.html',schedForm = SchedForm)
 
 
 class slots(db.Model):
@@ -998,6 +1031,7 @@ class slots(db.Model):
   __tablename__ = "slots_db"
 
   id = db.Column(db.Integer, primary_key=True)
+  
   daynumber = db.Column(db.Integer)
   shiftnumber = db.Column(db.Integer)
   doctorID = db.Column(db.Integer, ForeignKey('users.id'))
@@ -1015,88 +1049,125 @@ class SlotTable(Table):
    shiftnumber = Col('shirft #')
    doctorID = Col('Doctor id')
 
-def sorter(Su1, M1, T1, W1, Th1, F1, S1):
+def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   #construct a schedule table with slots
+  spotlist = ["third", "forth", "fifth", "sixth", "seventh", "postcall"]
+
+
+  allusers = User.query.all()
+
   matrix = [[None for y in range(0,7)] for x in range(0,9)]
   for i in range(0,9):
    for j in range(0,7):
     matrix[i][j] = slots(j + 1, i + 1, doctorID = None)
 
-  k = 1
-  filled = False
-  for i in range(0,len(M1)):
-   if M1[i].is_cardio is True and filled is False:
-    matrix[0][0].doctorID = M1[i].id
-    filled = True
-   else:
-    matrix[k][0].doctorID = M1[i].id
-    k += 1
+  #monday 1
+  firstam = min_firstam(M1)
+  firstpm = min_firstpm(M1, firstam)
+  second = min_second(M1, firstam, firstpm)
+  matrix[0][0].doctorID = firstam.id
+  matrix[1][0].doctorID = firstpm.id
+  matrix[2][0].doctorID = second.id
   
-  k = 1
-  filled = False
-  for i in range(0,len(T1)):
-   if T1[i].is_cardio is True and filled is False:
-    matrix[0][1].doctorID = T1[i].id
-    filled = True
-   else:
-    matrix[k][1].doctorID = T1[i].id
+  k = 3 
+  for i in range(0 , len(M1)-3 ):
+    nextslot = min_val(T1, spotlist[i])
+    matrix[k][0].doctorID = nextslot.id
     k += 1
-   matrix[8][1].doctorID = matrix[0][0].doctorID
 
-  k = 1
-  filled = False
-  for i in range(0,len(W1)):
-   if W1[i].is_cardio is True and filled is False:
-    matrix[0][2].doctorID = W1[i].id
-    filled = True
-   else:
-    matrix[k][2].doctorID = W1[i].id
-    k += 1
-   matrix[8][2].doctorID = matrix[0][1].doctorID
 
-  k = 1
-  filled = False
-  for i in range(0,len(Th1)):
-   if Th1[i].is_cardio is True and filled is False:
-    matrix[0][3].doctorID = Th1[i].id
-    filled = True
-   else:
-    matrix[k][3].doctorID = Th1[i].id
-    k += 1
-   matrix[8][3].doctorID = matrix[0][2].doctorID
 
-  k = 1
-  filled = False
-  for i in range(0,len(F1)):
-   if F1[i].is_cardio is True and filled is False:
-    matrix[0][4].doctorID = F1[i].id
-    filled = True
-   else:
-    matrix[k][4].doctorID = F1[i].id
-    k += 1
-   matrix[8][4].doctorID = matrix[0][3].doctorID
 
-  k = 1
-  filled = False
-  for i in range(0,len(S1)):
-   if S1[i].is_cardio is True and filled is False:
-    matrix[0][5].doctorID = S1[i].id
-    filled = True
-   else:
-    matrix[k][5].doctorID = S1[i].id
-    k += 1
-   matrix[8][5].doctorID = matrix[0][4].doctorID
+  #k = 3 
+  #excludelist = [firstam.id, firstpm.id, second.id]
+  # for i in range(0 , len(M1)-3 ):
+  #   print("i = ", i, "      :     nextslot = min_val(M1,", spotlist[i],") = ", min_val(M1, spotlist[i]))
+  #   nextslot = min_val_check(M1, spotlist[i], excludelist)
+  #   for j in len(M1)
+  #     if nextslot.id = matrix[j][0]
+  #       excludelist.append(nextslot)
+  #       break
 
-  k = 1
-  filled = False
-  for i in range(0,len(Su1)):
-   if Su1[i].is_cardio is True and filled is False:
-    matrix[0][6].doctorID = Su1[i].id
-    filled = True
-   else:
-    matrix[k][6].doctorID = Su1[i].id
+  #   matrix[k][0].doctorID = nextslot.id
+  #   k += 1
+
+ #tuesday 1
+  firstam = min_firstam(T1)
+  firstpm = min_firstpm(T1, firstam)
+  second = min_second(T1, firstam, firstpm)
+  matrix[0][1].doctorID = firstam.id
+  matrix[1][1].doctorID = firstpm.id
+  matrix[2][1].doctorID = second.id
+  
+  k = 3 
+  for i in range(0 , len(T1)-3 ):
+    nextslot = min_val(T1, spotlist[i])
+    matrix[k][1].doctorID = nextslot.id
     k += 1
-   matrix[8][6].doctorID = matrix[0][5].doctorID
+  matrix[8][1].doctorID = matrix[1][0].doctorID
+
+  #wednesday 1 
+  firstam = min_firstam(W1)
+  firstpm = min_firstpm(W1, firstam)
+  second = min_second(W1, firstam, firstpm)
+  matrix[0][2].doctorID = firstam.id
+  matrix[1][2].doctorID = firstpm.id
+  matrix[2][2].doctorID = second.id
+  
+  k = 3 
+  for i in range(0 , len(W1)-3 ):
+    nextslot = min_val(T1, spotlist[i])
+    matrix[k][2].doctorID = nextslot.id
+    k += 1
+  matrix[8][2].doctorID = matrix[1][1].doctorID
+
+
+  #Thursday 1
+  firstam = min_firstam(Th1)
+  firstpm = min_firstpm(Th1, firstam)
+  second = min_second(W1, firstam, firstpm)
+  matrix[0][3].doctorID = firstam.id
+  matrix[1][3].doctorID = firstpm.id
+  matrix[2][3].doctorID = second.id
+  
+  k = 3 
+  for i in range(0 , len(Th1)-3 ):
+    nextslot = min_val(Th1, spotlist[i])
+    matrix[k][3].doctorID = nextslot.id
+    k += 1
+  matrix[8][3].doctorID = matrix[1][2].doctorID
+
+
+
+
+  #friday 1
+  firstam = min_firstam(F1)
+  firstpm = min_firstpm(F1, firstam)
+  second = min_second(F1, firstam, firstpm)
+  matrix[0][4].doctorID = firstam.id
+  matrix[1][4].doctorID = firstpm.id
+  matrix[2][4].doctorID = second.id
+  
+  k = 3 
+  for i in range(0 , len(F1)-3 ):
+    nextslot = min_val(F1, spotlist[i])
+    matrix[k][4].doctorID = nextslot.id
+    k += 1
+  matrix[8][4].doctorID = matrix[1][3].doctorID
+
+
+  #saturday 1
+  matrix[0][5].doctorID = second.id #second on friday = first am/pm on saturday
+  matrix[1][5].doctorID = second.id
+  matrix[2][5].doctorID = firstam.id #first am friday = second on saturday
+  matrix[3][5].doctorID = min_val(allusers, "thrid").id
+
+  #sunday 1
+  matrix[0][6].doctorID = firstam.id #firstam on friday = first am/pm on sunday
+  matrix[1][6].doctorID = firstam.id
+  matrix[2][6].doctorID = second.id #second on friday = second on sunday
+  matrix[3][6].doctorID = min_val(allusers, "thrid").id
+
 
   return matrix
   #sort so every user gets around the same number of spots
@@ -1104,15 +1175,220 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1):
   #whoever works 'first_PM' will work 'PostCall' the next day always
 
 
+def min_firstam(userlist): #gives user with the minimum firstam value from a list of users
+  min_firstam = None
+  for i in range(0,len(userlist)):
+    if i == 0:
+      min_firstam = userlist[i]
+    else:
+      if userlist[i].firstam < min_firstam.firstam:
+        min_firstam = userlist[i] 
+
+  #ival = min_firstam.firstam + 1
+  #user.update().values(firstam = ival).where(user.id == min_firstam.id)
+  min_firstam.firstam += 1
+  db.session.commit()
+
+  return(min_firstam)
+
+def min_firstpm(userlist, first_am): #gives user with the minimum firstpm value from a list of users given firstam
+  min_firstpm = None
+
+  for i in range(0,len(userlist)):
+      if first_am.id != userlist[i].id:  #isnt first_am
+        if first_am.is_cardio is True: #dont need 2 cardios
+          if userlist[i].is_cardio is False: 
+           if min_firstpm == None:
+             min_firstpm = userlist[i]
+           else:
+             if userlist[i].firstpm < min_firstpm.firstpm:
+                min_firstpm = userlist[i]
+        else:                             #if not cardio, we need one
+          if userlist[i].is_cardio is True:
+            if min_firstpm == None:
+              min_firstpm = userlist[i]
+            else:
+              if userlist[i].firstpm < min_firstpm.firstpm:
+                min_firstpm = userlist[i]
+
+  #ival = min_firstpm.firstpm + 1
+  #user.update().values(firstpm = ival).where(user.id == min_firstpm.id)
+  min_firstpm.firstpm += 1
+  db.session.commit()
+
+  return(min_firstpm)
+
+def min_second(userlist, first_am, first_pm): #gives user with the minimum second value from a list of users given firstam and firstpm
+  min_second = None
+
+  for i in range(0,len(userlist)):
+    if first_am.id != userlist[i].id and first_pm.id != userlist[i].id :  #isnt first_am or first_pm
+      if min_second == None:
+        min_second = userlist[i]
+      else:
+        if userlist[i].second < min_second.second:
+          min_second = userlist[i]
+
+  #ival = min_second.second + 1
+  #user.update().values(second = ival).where(user.id == min_second.id)
+  min_second.second += 1
+  db.session.commit()
+  return(min_second)
+
+def min_val(userlist, parameter): #gives user with the minimum value of a parameter from a list of users
+  min_val = None
+
+  for i in range(0,len(userlist)):
+    if i == 0:
+      min_val = userlist[i]
+    else:
+      if parameter == "firstam": 
+        if userlist[i].firstam < min_val.firstam:
+          min_val = userlist[i] 
+      if parameter == "firstpm": 
+        if userlist[i].firstpm < min_val.firstpm:
+          min_val = userlist[i] 
+      if parameter == "second": 
+        if userlist[i].second < min_val.second:
+          min_val = userlist[i] 
+      if parameter == "third": 
+        if userlist[i].third < min_val.third:
+          min_val = userlist[i] 
+      if parameter == "fourth": 
+        if userlist[i].fourth < min_val.fourth:
+          min_val = userlist[i] 
+      if parameter == "fifth": 
+        if userlist[i].fifth < min_val.fifth:
+          min_val = userlist[i] 
+      if parameter == "sixth": 
+        if userlist[i].sixth < min_val.sixth:
+          min_val = userlist[i] 
+      if parameter == "seventh": 
+        if userlist[i].seventh < min_val.seventh:
+          min_val = userlist[i] 
+      if parameter == "postcall": 
+        if userlist[i].postcall < min_val.postcall:
+          min_val = userlist[i]
+
+  if parameter == "firstam":
+    min_val.firstam += 1
+    #ival = min_val.firstam + 1
+    #user.update().values(firstam = ival).where(user.id == min_val.id)
+  
+  if parameter == "firstpm":
+    min_val.firstpm += 1
+    #ival = min_val.firstpm + 1
+    #user.update().values(firstpm = ival).where(user.id == min_val.id)
+  
+  if parameter == "second":
+    min_val.second += 1
+    #ival = min_val.second + 1
+    #user.update().values(second = 1).where(user.id == min_val.id)
+  
+  if parameter == "third":
+    min_val.third += 1
+    #ival = min_val.third + 1
+    #user.update().values(third = ival).where(user.id == min_val.id)
+
+  if parameter == "fourth":
+    min_val.fourth += 1
+    #ival = min_val.fourth + 1
+    #user.update().values(fourth = ival).where(user.id == min_val.id)
+
+  if parameter == "fifth":
+    min_val.fifth += 1
+    #ival = min_val.fifth + 1
+    #user.update().values(fifth = ival).where(user.id == min_val.id)
+
+  if parameter == "sixth":
+    min_val.sixth += 1
+    #ival = min_val.sixth + 1
+    #user.update().values(sixth = ival).where(user.id == min_val.id)
+
+  if parameter == "seventh":
+    min_val.seventh += 1
+    #ival = min_val.seventh + 1
+    #user.update().values(seventh = ival).where(user.id == min_val.id)
+
+  if parameter == "postcall":
+    min_val.postcall += 1
+    #ival = min_val.postcall + 1
+    #user.update().values(postcall = ival).where(user.id == min_val.id)
+
+  db.session.commit()
+
+  return(min_val)
+
+
+# def min_val_check(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users, doesnt iterate
+#   min_val = None
+
+#   userlist = [] 
+#   for i in len(inputlist):
+#     for j in len(excludelist):
+#       if inputlist[i] == excludelist[j]:
+#           break:
+
+
+#   for i in range(0,len(userlist)):
+#     if i == 0:
+#       min_val = userlist[i]
+#     else:
+#       if parameter == "firstam": 
+#         if userlist[i].firstam < min_val.firstam:
+#           min_val = userlist[i] 
+#       if parameter == "firstpm": 
+#         if userlist[i].firstpm < min_val.firstpm:
+#           min_val = userlist[i] 
+#       if parameter == "second": 
+#         if userlist[i].second < min_val.second:
+#           min_val = userlist[i] 
+#       if parameter == "third": 
+#         if userlist[i].third < min_val.third:
+#           min_val = userlist[i] 
+#       if parameter == "fourth": 
+#         if userlist[i].fourth < min_val.fourth:
+#           min_val = userlist[i] 
+#       if parameter == "fifth": 
+#         if userlist[i].fifth < min_val.fifth:
+#           min_val = userlist[i] 
+#       if parameter == "sixth": 
+#         if userlist[i].sixth < min_val.sixth:
+#           min_val = userlist[i] 
+#       if parameter == "seventh": 
+#         if userlist[i].seventh < min_val.seventh:
+#           min_val = userlist[i] 
+#       if parameter == "postcall": 
+#         if userlist[i].postcall < min_val.postcall:
+#           min_val = userlist[i]
+
+
+
+
+
+#   return min_val
 
 @app.route('/schedule')
 def schedule():
-  # s = slots.query.all()
-  # grid = []
-  # for i in range(0, len(s), 7):
+ # NU = Number_Users.query.all()
+ # s = []
+ # grid = []
+  
+  #for j in range(1*NU[-1].id, 8*NU[-1].id):
+   # s.append(slots.query.filter_by(daynumber=j))
+
+  #for i in range(0,len(s)):
   #  grid.append(s[i:i+7])
-  # return render_template('schedule.html', matrix = grid)
-  return render_template('schedule.html')
+
+  #slots.filter_by()
+
+  s = slots.query.all()
+
+  grid = []
+  for i in range(0, len(s), 7):
+    grid.append(s[i:i+7])
+  return render_template('schedule.html', matrix = grid)
+
   
 
 @app.route("/logout")
