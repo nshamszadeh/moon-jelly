@@ -37,7 +37,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 app = Flask(__name__)
 #mail = Mail(app)
 
-
+'''
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -45,7 +45,7 @@ app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-
+'''
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -328,7 +328,7 @@ def Mbox(title, text, style):
 
 @app.route('/<name>/<location>')
 def Schedule(name,location):
-  rendered=render_template('schedule.html', name=name, Location=location)
+  rendered=render_template('users.html', name=name, Location=location)
 
   
   css=['img/style.css']
@@ -373,6 +373,7 @@ def login():
       form.email.errors.append('Invalid Email!')
   return render_template('login.html', form=form)
 
+'''
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def reset_password():
   form = EmailForm()
@@ -386,7 +387,7 @@ def reset_password():
   else:
     print('something isnt riiight')
   return render_template('reset_password.html', form = form)
-
+'''
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -432,16 +433,18 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
-def send_password_email(user):
-    token = user.get_reset_token()
-    msg = Message('Set ur goddamn Password here',
-                  sender='moonjelly323@gmail.com',
-                  recipients=[user.email])
-    msg.body = f'''To set your password, visit the following link:
-{url_for('set_token', token=token, _external=True)}
-If you did not make this request then simply ignore this email and no changes will be made.
 '''
-    mail.send(msg)
+def send_password_email(user):
+  token = user.get_reset_token()
+  msg = Message('Set ur goddamn Password here',
+                sender='moonjelly323@gmail.com',
+                recipients=[user.email])
+#  msg.body = f''' #To set your password, visit the following link:
+#{url_for('set_token', token=token, _external=True)}
+#If you did not make this request then simply ignore this email and no changes will be made.
+''' 
+  mail.send(msg)
+'''
 
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
@@ -540,7 +543,7 @@ def send_js(path):
 @app.route('/about')
 def about():
   try:
-    message = subprocess.check_output(['hi'], shell=True)
+    message = subprocess.check_output(['about'], shell=True)
   except:
     message = "Sorry, we coundn't run that command..."
   #dir:command you want to run(name)
