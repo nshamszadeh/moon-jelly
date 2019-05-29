@@ -14,6 +14,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from io import StringIO
 from xhtml2pdf import pisa
 
+
 import csv
 from flask import Flask, make_response, render_template
 from flask import Flask, request, jsonify
@@ -23,6 +24,8 @@ import pdfkit
 
 from flask import Flask, flash, request, redirect, url_for
 from flask_table import Table, Col 
+from flask import Flask, render_template, redirect, url_for
+#from flask_mail import Mail, Message
 
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
@@ -32,6 +35,8 @@ from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
+#mail = Mail(app)
+
 
 # youve got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -41,10 +46,12 @@ app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for 
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
+
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAxY' # need to change later
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
@@ -322,31 +329,23 @@ def load_user(user_id):
 # wtf does this do
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
-'''
-class Pdf():
-
-    def render_pdf(self, name, html):
-
-        pdf = StringIO()
-
-        pisa.CreatePDF(StringIO(html), pdf)
-
-        return pdf.getvalue()
 
 
-@app.route('/invoice/<business_name>/<tin>',  methods=['GET'])
-def view_invoice(business_name, tin):
+@app.route('/<name>/<location>')
+def Schedule(name,location):
+  rendered=render_template('schedule.html', name=name, Location=location)
 
-    #pdf = StringIO()
-    html = render_template(
-        'schedule.html', business_name=business_name, tin=tin)
-    file_class = Pdf()
-    pdf = file_class.render_pdf(business_name, html)
-    headers = {
-        'content-type': 'application.pdf',
-        'content-disposition': 'attachment; filename=certificate.pdf'}
-    return pdf, 200, headers
-'''
+  
+  css=['img/style.css']
+  pdf=pdfkit.from_string(rendered,False,css=css)
+
+  response=make_response(pdf)
+  response.headers['Content-Type']='application/pdf'
+  response.headers['Content-Disposition']='attachment; filename=output.pdf'
+  
+  return response
+  
+  #return render_template('Certificate.html')
 
 @app.route('/')
 def homepage():
@@ -984,17 +983,25 @@ def make2():
 
 
       #sorter2(Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2) 
-      print("min_val(Su1, second) = ", min_val(Su1, 'second'))
+      #print("min_val(Su1, second) = ", min_val(Su1, 'second'))
+      #M, nw1, nw2 = sorter(parameter)
 
-      matrix = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None, None)    
+      matrix, nw1, nw2 = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None)    
       for row in matrix:
         for slot in row:
           db.session.add(slot)
 
-      # matrix = sorter(Su2, M2, T2, W2, Th2, F2, S2)    
-      # for row in matrix:
-      #   for slot in row:
-      #     db.session.add(slot)
+      matrix2, nw3, nw4 = sorter(Su2, M2, T2, W2, Th2, F2, S2, nw1, nw2)    
+      for row in matrix2:
+        for slot in row:
+          db.session.add(slot)
+      
+
+      matrix3 = sorter(Su2, M2, T2, W2, Th2, F2, S2, nw3, nw4)[0]
+      for row in matrix3:
+        for slot in row:
+          db.session.add(slot)
+      
 
       db.session.commit()
       return(redirect('/schedule'))
@@ -1032,15 +1039,15 @@ class slots(db.Model):
 class SlotTable(Table):
    id = Col('db id')
    daynumber = Col('day #')
-   shiftnumber = Col('shirft #')
+   shiftnumber = Col('shift #')
    doctorID = Col('Doctor id')
 
-def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
+def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   #construct a schedule table with slots
-  spotlist = ["thrid", "forth", "fifth", "sixth", "seventh", "postcall"]
+  spotlist = ["third", "forth", "fifth", "sixth", "seventh", "postcall"]
 
 
-  allusers = User.query.all()
+  #allusers = User.query.all()
 
   matrix = [[None for y in range(0,7)] for x in range(0,9)]
   for i in range(0,9):
@@ -1054,30 +1061,17 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[0][0].doctorID = firstam.id
   matrix[1][0].doctorID = firstpm.id
   matrix[2][0].doctorID = second.id
-  
+
   k = 3 
+  excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(M1)-3 ):
-    nextslot = min_val(T1, spotlist[i])
+    #print("i = ", i, "      :     nextslot = min_val(M1,", spotlist[i],",excludelist) = ", min_val(M1, spotlist[i],excludelist))
+    nextslot = min_val(M1, spotlist[i], excludelist)
     matrix[k][0].doctorID = nextslot.id
+    excludelist.append(nextslot.id)
     k += 1
 
-
-
-
-  #k = 3 
-  #excludelist = [firstam.id, firstpm.id, second.id]
-  # for i in range(0 , len(M1)-3 ):
-  #   print("i = ", i, "      :     nextslot = min_val(M1,", spotlist[i],") = ", min_val(M1, spotlist[i]))
-  #   nextslot = min_val_check(M1, spotlist[i], excludelist)
-  #   for j in len(M1)
-  #     if nextslot.id = matrix[j][0]
-  #       excludelist.append(nextslot)
-  #       break
-
-  #   matrix[k][0].doctorID = nextslot.id
-  #   k += 1
-
- #tuesday 1
+  #tuesday 1
   firstam = min_firstam(T1)
   firstpm = min_firstpm(T1, firstam)
   second = min_second(T1, firstam, firstpm)
@@ -1086,9 +1080,11 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[2][1].doctorID = second.id
   
   k = 3 
+  excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(T1)-3 ):
-    nextslot = min_val(T1, spotlist[i])
-    matrix[k][1].doctorID = nextslot.id
+    nextslot = min_val(T1, spotlist[i], excludelist)
+    matrix[k][0].doctorID = nextslot.id
+    excludelist.append(nextslot.id)
     k += 1
   matrix[8][1].doctorID = matrix[1][0].doctorID
 
@@ -1101,9 +1097,11 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[2][2].doctorID = second.id
   
   k = 3 
+  excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(W1)-3 ):
-    nextslot = min_val(T1, spotlist[i])
-    matrix[k][2].doctorID = nextslot.id
+    nextslot = min_val(W1, spotlist[i], excludelist)
+    matrix[k][0].doctorID = nextslot.id
+    excludelist.append(nextslot.id)
     k += 1
   matrix[8][2].doctorID = matrix[1][1].doctorID
 
@@ -1117,9 +1115,11 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[2][3].doctorID = second.id
   
   k = 3 
+  excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(Th1)-3 ):
-    nextslot = min_val(Th1, spotlist[i])
-    matrix[k][3].doctorID = nextslot.id
+    nextslot = min_val(Th1, spotlist[i], excludelist)
+    matrix[k][0].doctorID = nextslot.id
+    excludelist.append(nextslot.id)
     k += 1
   matrix[8][3].doctorID = matrix[1][2].doctorID
 
@@ -1135,9 +1135,11 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[2][4].doctorID = second.id
   
   k = 3 
+  excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(F1)-3 ):
-    nextslot = min_val(F1, spotlist[i])
-    matrix[k][4].doctorID = nextslot.id
+    nextslot = min_val(F1, spotlist[i], excludelist)
+    matrix[k][0].doctorID = nextslot.id
+    excludelist.append(nextslot.id)
     k += 1
   matrix[8][4].doctorID = matrix[1][3].doctorID
 
@@ -1146,16 +1148,21 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2, notweekend3):
   matrix[0][5].doctorID = second.id #second on friday = first am/pm on saturday
   matrix[1][5].doctorID = second.id
   matrix[2][5].doctorID = firstam.id #first am friday = second on saturday
-  matrix[3][5].doctorID = min_val(allusers, "thrid").id
+  excludelist = [second.id, firstam.id]
+  matrix[3][5].doctorID = min_val(S1, "thrid", excludelist).id  ###FIX THIS
 
   #sunday 1
   matrix[0][6].doctorID = firstam.id #firstam on friday = first am/pm on sunday
   matrix[1][6].doctorID = firstam.id
   matrix[2][6].doctorID = second.id #second on friday = second on sunday
-  matrix[3][6].doctorID = min_val(allusers, "thrid").id
+  excludelist = [firstam.id, second.id]
+  matrix[3][6].doctorID = min_val(Su1, "thrid", excludelist).id  ###FIX THIS
+ 
+  notweekend1 = matrix[0][5].doctorID = second.id
+  notweekend2 = matrix[2][5].doctorID = firstam.id
 
-
-  return matrix
+  return (matrix, notweekend1, notweekend2) 
+  
   #sort so every user gets around the same number of spots
   #if there are less users than spots, dont fill the higher numbered spots
   #whoever works 'first_PM' will work 'PostCall' the next day always
@@ -1189,6 +1196,9 @@ def min_firstpm(userlist, first_am): #gives user with the minimum firstpm value 
            else:
              if userlist[i].firstpm < min_firstpm.firstpm:
                 min_firstpm = userlist[i]
+                ###### WHAT IF THERE ARE NO CARDIOS?
+          ####elif min_firstpm == None:
+
         else:                             #if not cardio, we need one
           if userlist[i].is_cardio is True:
             if min_firstpm == None:
@@ -1196,6 +1206,8 @@ def min_firstpm(userlist, first_am): #gives user with the minimum firstpm value 
             else:
               if userlist[i].firstpm < min_firstpm.firstpm:
                 min_firstpm = userlist[i]
+          if min_firstpm == None:
+            min_firstpm = userlist[i]
 
   #ival = min_firstpm.firstpm + 1
   #user.update().values(firstpm = ival).where(user.id == min_firstpm.id)
@@ -1221,8 +1233,32 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
   db.session.commit()
   return(min_second)
 
-def min_val(userlist, parameter): #gives user with the minimum value of a parameter from a list of users
+def min_val(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users
   min_val = None
+
+  #print("parameter = " , parameter)
+
+  userlist = [] 
+  for i in range(0,len(inputlist)):
+    add = False
+    for j in range(0,len(excludelist)):
+      # print( "i = ",i,"   j = " ,j)
+      if inputlist[i].id == excludelist[j]:
+        #print("broke at ", "j = ",j, "i = ",i)
+        #print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
+        break
+      else:
+        if j == len(excludelist)-1:
+          #print ("add = True")
+          add = True
+    if add == True:
+      userlist.append(inputlist[i])
+
+  #print("inputlist = ", inputlist)
+  #print("excludelist = ", excludelist)
+  #print("userlist = ", userlist)
+
+
 
   for i in range(0,len(userlist)):
     if i == 0:
@@ -1272,7 +1308,9 @@ def min_val(userlist, parameter): #gives user with the minimum value of a parame
     #user.update().values(second = 1).where(user.id == min_val.id)
   
   if parameter == "third":
+    print("min_val.thrid before iterating =   ", min_val.third)
     min_val.third += 1
+    print("min_val.thrid after iterating =   ", min_val.third)
     #ival = min_val.third + 1
     #user.update().values(third = ival).where(user.id == min_val.id)
 
@@ -1306,53 +1344,59 @@ def min_val(userlist, parameter): #gives user with the minimum value of a parame
   return(min_val)
 
 
-# def min_val_check(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users, doesnt iterate
-#   min_val = None
+def min_val_check(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users, doesnt iterate
+  min_val = None
 
-#   userlist = [] 
-#   for i in len(inputlist):
-#     for j in len(excludelist):
-#       if inputlist[i] == excludelist[j]:
-#           break:
-
-
-#   for i in range(0,len(userlist)):
-#     if i == 0:
-#       min_val = userlist[i]
-#     else:
-#       if parameter == "firstam": 
-#         if userlist[i].firstam < min_val.firstam:
-#           min_val = userlist[i] 
-#       if parameter == "firstpm": 
-#         if userlist[i].firstpm < min_val.firstpm:
-#           min_val = userlist[i] 
-#       if parameter == "second": 
-#         if userlist[i].second < min_val.second:
-#           min_val = userlist[i] 
-#       if parameter == "third": 
-#         if userlist[i].third < min_val.third:
-#           min_val = userlist[i] 
-#       if parameter == "fourth": 
-#         if userlist[i].fourth < min_val.fourth:
-#           min_val = userlist[i] 
-#       if parameter == "fifth": 
-#         if userlist[i].fifth < min_val.fifth:
-#           min_val = userlist[i] 
-#       if parameter == "sixth": 
-#         if userlist[i].sixth < min_val.sixth:
-#           min_val = userlist[i] 
-#       if parameter == "seventh": 
-#         if userlist[i].seventh < min_val.seventh:
-#           min_val = userlist[i] 
-#       if parameter == "postcall": 
-#         if userlist[i].postcall < min_val.postcall:
-#           min_val = userlist[i]
+  userlist = [] 
+  for i in range(0,len(inputlist)):
+    add = False
+    for j in range(0,len(excludelist)):
+      if inputlist[i] == excludelist[j]:
+        break
+      elif j == len(excludelist):
+        add = True
+    if add == True:
+      userlist.append(inputlist[i])
+          
 
 
+  for i in range(0,len(userlist)):
+    if i == 0:
+      min_val = userlist[i]
+    else:
+      if parameter == "firstam": 
+        if userlist[i].firstam < min_val.firstam:
+          min_val = userlist[i] 
+      if parameter == "firstpm": 
+        if userlist[i].firstpm < min_val.firstpm:
+          min_val = userlist[i] 
+      if parameter == "second": 
+        if userlist[i].second < min_val.second:
+          min_val = userlist[i] 
+      if parameter == "third": 
+        if userlist[i].third < min_val.third:
+          min_val = userlist[i] 
+      if parameter == "fourth": 
+        if userlist[i].fourth < min_val.fourth:
+          min_val = userlist[i] 
+      if parameter == "fifth": 
+        if userlist[i].fifth < min_val.fifth:
+          min_val = userlist[i] 
+      if parameter == "sixth": 
+        if userlist[i].sixth < min_val.sixth:
+          min_val = userlist[i] 
+      if parameter == "seventh": 
+        if userlist[i].seventh < min_val.seventh:
+          min_val = userlist[i] 
+      if parameter == "postcall": 
+        if userlist[i].postcall < min_val.postcall:
+          min_val = userlist[i]
 
 
 
-#   return min_val
+
+
+  return min_val
 
 @app.route('/schedule')
 def schedule():
@@ -1383,6 +1427,7 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
+#pdfkit.from_url('https://moon-jelly.herokuapp.com/schedule', 'schedule.pdf')  
 
 
 if __name__ == '__main__':
