@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 {% block body %}
+<head>
+<style>
+body {background-color: powderblue;}
+</style>
+</head>
+
      <form action="" method="POST">
+        <hr>
             {% for field in numuForm  %}
             <p>
                 {{field.label}}
@@ -11,6 +18,8 @@
                 Submit
             </button>
         </form>
+
+        <hr>
 {% endblock %}
 
 

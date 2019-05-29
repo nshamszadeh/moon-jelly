@@ -5,8 +5,9 @@
 <head>
 <style>
 body {background-color: powderblue;}
-input {width: 100%;}
-label {display: none;}
+input {
+  width: 50%;
+}
 </style>
 </head>
 
@@ -15,15 +16,15 @@ label {display: none;}
 <div class="container-fluid padding">
 <div class="row welcome text-center">
   <div class="col-12">
-    <h1 class="display-7">who is working each day?</h1>
+    <h1 class="display-7">input number of users per day</h1>
   </div>
 </div>
 </div>
 
 <div class="row">
- <div class="col">
-    Week #
- </div>
+  <div class="col">
+    Sunday
+  </div>
   <div class="col">
     Monday
   </div>
@@ -42,19 +43,26 @@ label {display: none;}
   <div class="col">
     Saturday
   </div>
-  <div class="col">
-    Sunday
-  </div>
 </div>
 
 <form action="" method="POST">
   <div class="row">
-    <div class="col">
-        Week 1
-    </div>
+            <div class="col">
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu1%}
+            <div class="row">
+            <!--{{ Schedule_Entry_Form.hidden_tag() }}-->
+            {{Schedule_Entry_Form}}
+            {{Schedule_Entry_Form.label}}
+            {{ schedForm.csrf_token() }}
+            </div>
+            {% endfor %}
+            </div>
+
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -63,6 +71,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -71,6 +81,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -80,6 +92,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -89,6 +103,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -97,32 +113,32 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS1%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
             </div>
+        
+
+
+
 
             <div class="col">
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu1%}
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
-            </div>
+            </div> 
             {% endfor %}
             </div>
-
-        </div>
-
-
-<hr>
-
-         <div class="row">
-           <div class="col">      
-            Week 2
-           </div>
         
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -132,6 +148,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -140,6 +158,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -149,6 +169,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -157,6 +179,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -166,29 +190,28 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS2%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
             </div>
-
+        
             <div class="col">
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu2%}
+            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
             </div>
-        </div>
-
-<hr>
-        <div class="row">
-            <div class="col">      
-            Week 3
-           </div>
         
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesM3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -197,6 +220,8 @@ label {display: none;}
              <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesT3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -205,6 +230,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesW3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -214,6 +241,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesTh3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -222,6 +251,8 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesF3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
@@ -230,25 +261,16 @@ label {display: none;}
             <div class="col">
             {% for Schedule_Entry_Form in schedForm.userfirstNamesS3%}
             <div class="row">
+            {{ Schedule_Entry_Form.hidden_tag() }}
+            {{Schedule_Entry_Form.label}}
             {{Schedule_Entry_Form}}
             </div> 
             {% endfor %}
             </div>
-
-            <div class="col">
-            {% for Schedule_Entry_Form in schedForm.userfirstNamesSu3%}
-            <div class="row">
-            {{Schedule_Entry_Form}}
-            </div> 
-            {% endfor %}
-            </div>
-            
         </div>
-    </div>
-{{ schedForm.csrf_token() }}
+
             <button>
                   Submit
             </button>
         </form> 
-        <hr>
 {% endblock %}
