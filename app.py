@@ -1014,7 +1014,8 @@ def make2():
   # grid = []
   # for i in range(0, len(s), 7):
   #  grid.append(s[i:i+7])
-  return render_template('make2.html', schedForm = SchedForm)
+
+  return render_template('make2.html',schedForm = SchedForm)
 
 
 class slots(db.Model):
