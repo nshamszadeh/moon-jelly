@@ -337,14 +337,7 @@ def Mbox(title, text, style):
 
 @app.route('/<name>/<location>')
 def PrintSchedule(name,location):
-
-  '''
-  s = slots.query.all()
-
-  d = []
-  for i in range(0, len(s), 7):
-     d.append(s[i:i+7])
-'''
+  
   s = slots.query.all()
   grid = []
   grid2 = []
