@@ -57,9 +57,14 @@ app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAx
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
 
+
+
 mail = Mail(app)
+
+
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -332,10 +337,15 @@ def Mbox(title, text, style):
 
 
 @app.route('/<name>/<location>')
-def Schedule(name,location):
-  rendered=render_template('schedule.html', name=name, Location=location)
 
-  
+def PrintSchedule(name,location):
+  s = slots.query.all()
+
+  grid = []
+  for i in range(0, len(s), 7):
+     grid.append(s[i:i+7])
+
+  rendered=render_template('schedule.html', matrix=grid, name=name, Location=location)  
   css=['img/style.css']
   pdf=pdfkit.from_string(rendered,False,css=css)
 
@@ -344,8 +354,6 @@ def Schedule(name,location):
   response.headers['Content-Disposition']='attachment; filename=output.pdf'
   
   return response
-  
-  #return render_template('Certificate.html')
 
 @app.route('/')
 def homepage():
@@ -377,6 +385,7 @@ def login():
     else:
       form.email.errors.append('Invalid Email!')
   return render_template('login.html', form=form)
+
 
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def reset_password():
@@ -437,16 +446,19 @@ def register():
   # add html file here
   return render_template('register.html', form = register_form)
 
+
+
 def send_password_email(user):
-    token = user.get_reset_token()
-    msg = Message('Set ur goddamn Password here',
-                  sender='moonjelly323@gmail.com',
-                  recipients=[user.email])
-    msg.body = f'''To set your password, visit the following link:
+  token = user.get_reset_token()
+  msg = Message('Set ur goddamn Password here',
+                sender='moonjelly323@gmail.com',
+                recipients=[user.email])
+  msg.body = f'''To set your password, visit the following link:
 {url_for('set_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-    mail.send(msg)
+  mail.send(msg)
+
 
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
@@ -516,6 +528,7 @@ def set_token(token):
     return redirect(url_for('login'))
   return render_template('set_password.html', form=form)
 
+
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
 def remove():
@@ -545,7 +558,7 @@ def send_js(path):
 @app.route('/about')
 def about():
   try:
-    message = subprocess.check_output(['hi'], shell=True)
+    message = subprocess.check_output(['about'], shell=True)
   except:
     message = "Sorry, we coundn't run that command..."
   #dir:command you want to run(name)
