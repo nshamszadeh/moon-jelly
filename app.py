@@ -1397,7 +1397,7 @@ def schedule():
     grid2.append(s[i:i+7])
   for i in range(126, 189, 7):
     grid3.append(s[i:i+7])
-  
+
   return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
 
 @app.route("/logout")

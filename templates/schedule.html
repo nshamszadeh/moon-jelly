@@ -104,7 +104,181 @@
   </tbody>
 </table>
 
+<br>
+<br>
+
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+
+    <h1 class="display-7">Schedule for Week 2</h1>
+
+  </div>
+  <hr>
+</div>
+</div>
+<table class="table table-bordered table-hover">
+  <thead class="table-primary">
+    <tr>
+      <th scope="col">Pos\Day</th>
+      <th scope="col">Monday</th>
+      <th scope="col">Tuesday</th>
+      <th scope="col">Wednesday</th>
+      <th scope="col">Thursday</th>
+      <th scope="col">Friday</th>
+      <th scope="col">Saturday</th>
+      <th scope="col">Sunday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1st AM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix2[0][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">1st PM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix2[1][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">2nd Call</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix2[2][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">3rd Call</th>
+      {%for i in range(5)%}
+       <td>{{matrix2[3][i].doctor.first_name}}</td>
+      {%endfor%}       
+      <td class="table-info">{{matrix2[3][5].doctor.first_name}}</td>
+      <td class="table-info">{{matrix2[3][6].doctor.first_name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">4th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix2[4][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">5th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix2[5][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">6th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix2[6][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">7th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix2[7][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">Post Call</th>
+      {%for i in range(7)%}
+       <td class="table-success">{{matrix2[8][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+
+    <h1 class="display-7">Schedule for Week 3</h1>
+
+  </div>
+  <hr>
+</div>
+</div>
+<table class="table table-bordered table-hover">
+  <thead class="table-primary">
+    <tr>
+      <th scope="col">Pos\Day</th>
+      <th scope="col">Monday</th>
+      <th scope="col">Tuesday</th>
+      <th scope="col">Wednesday</th>
+      <th scope="col">Thursday</th>
+      <th scope="col">Friday</th>
+      <th scope="col">Saturday</th>
+      <th scope="col">Sunday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1st AM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix3[0][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">1st PM</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix3[1][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">2nd Call</th>
+      {%for i in range(7)%}
+       <td class="table-info">{{matrix3[2][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">3rd Call</th>
+      {%for i in range(5)%}
+       <td>{{matrix3[3][i].doctor.first_name}}</td>
+      {%endfor%}       
+      <td class="table-info">{{matrix3[3][5].doctor.first_name}}</td>
+      <td class="table-info">{{matrix3[3][6].doctor.first_name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">4th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix3[4][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">5th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix3[5][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">6th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix3[6][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">7th Call</th>
+      {%for i in range(7)%}
+       <td>{{matrix3[7][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+    <tr>
+      <th scope="row">Post Call</th>
+      {%for i in range(7)%}
+       <td class="table-success">{{matrix3[8][i].doctor.first_name}}</td>
+      {%endfor%}
+    </tr>
+  </tbody>
+</table>
+
       <a href="/Jenny/UCSB" button type="button" class="btn btn-lg active" aria-pressed="true">Print</a>
+</div>
+
 
 
 <!-- <div class="container">
@@ -279,33 +453,5 @@
 </div>
  -->
 
-<!-- <table style="width:100%">
-
-
-  <tr>
-    <th>Mon</th>
-    <th>Tue</th> 
-    <th>Wed</th>
-    <th>Thu</th>
-    <th>Fri</th>
-    <th>Sat</th>
-    <th>Sun</th>
-  </tr>
-
- <tr>
-     {{utable}}
- </tr>
-
-<tr>
-    <th>{{Mulist}}</th>
-    <th>{{Tulist}}</th> 
-    <th>{{Wulist}}</th>
-    <th>{{Thulist}}</th>
-    <th>{{Fulist}}</th>
-    <th>{{Sulist}}</th>
-    <th>{{Suulist}}</th>
-  </tr>
-
-</table>  -->
     
 {% endblock %}
