@@ -1258,11 +1258,11 @@ def min_val(inputlist, parameter, excludelist): #gives user with the minimum val
       # print( "i = ",i,"   j = " ,j)
       if inputlist[i].id == excludelist[j]:
         #print("broke at ", "j = ",j, "i = ",i)
-        #print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
+        print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
         break
       else:
         if j == len(excludelist)-1:
-          #print ("add = True")
+          print ("add = True")
           add = True
     if add == True:
       userlist.append(inputlist[i])
