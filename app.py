@@ -324,7 +324,7 @@ class UserTable(Table):
     firstam = Col('firstam')
     firstpm= Col('firstpm')
     second = Col('second')
-    third = Col('thrid')
+    third = Col('third')
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -1162,14 +1162,14 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   matrix[1][5].doctorID = second.id
   matrix[2][5].doctorID = firstam.id #first am friday = second on saturday
   excludelist = [second.id, firstam.id]
-  matrix[3][5].doctorID = min_val(S1, "thrid", excludelist).id  ###FIX THIS
+  matrix[3][5].doctorID = min_val(S1, "third", excludelist).id  ###FIX THIS
 
   #sunday 1
   matrix[0][6].doctorID = firstam.id #firstam on friday = first am/pm on sunday
   matrix[1][6].doctorID = firstam.id
   matrix[2][6].doctorID = second.id #second on friday = second on sunday
   excludelist = [firstam.id, second.id]
-  matrix[3][6].doctorID = min_val(Su1, "thrid", excludelist).id  ###FIX THIS
+  matrix[3][6].doctorID = min_val(Su1, "third", excludelist).id  ###FIX THIS
  
   notweekend1 = matrix[0][5].doctorID = second.id
   notweekend2 = matrix[2][5].doctorID = firstam.id
@@ -1321,9 +1321,9 @@ def min_val(inputlist, parameter, excludelist): #gives user with the minimum val
     #user.update().values(second = 1).where(user.id == min_val.id)
   
   if parameter == "third":
-    print("min_val.thrid before iterating =   ", min_val.third)
+    print("min_val.third before iterating =   ", min_val.third)
     min_val.third += 1
-    print("min_val.thrid after iterating =   ", min_val.third)
+    print("min_val.third after iterating =   ", min_val.third)
     #ival = min_val.third + 1
     #user.update().values(third = ival).where(user.id == min_val.id)
 
