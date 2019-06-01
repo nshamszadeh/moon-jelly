@@ -1210,6 +1210,8 @@ def min_firstpm(userlist, first_am): #gives user with the minimum firstpm value 
              if userlist[i].firstpm < min_firstpm.firstpm:
                 min_firstpm = userlist[i]
                 ###### WHAT IF THERE ARE NO CARDIOS?
+          if min_firstpm == None:
+            min_firstpm = userlist[i]
           ####elif min_firstpm == None:
 
         else:                             #if not cardio, we need one
