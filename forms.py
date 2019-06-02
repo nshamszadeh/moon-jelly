@@ -73,7 +73,6 @@ class NumberUsersForm(FlaskForm):
 	NumberUsersS1 = IntegerField('# Working on first Saturday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 	NumberUsersSu1 = IntegerField('# Working on first Sunday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 
-	
 	NumberUsersM2 = IntegerField('# Working on second Monday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
 	NumberUsersT2 = IntegerField('# Working on second Tuesday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
 	NumberUsersW2 = IntegerField('# Working on second Wednesday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
@@ -89,4 +88,8 @@ class NumberUsersForm(FlaskForm):
 	NumberUsersF3 = IntegerField('# Working on third Friday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
 	NumberUsersS3 = IntegerField('# Working on third Saturday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 	NumberUsersSu3 = IntegerField('# Working on third Sunday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
+	
+class RequestForm(FlaskForm):
+
+	post_call = SelectField('Select when you want post call:', choices = [('M', 'Monday'), ('T', 'Tuesday'), ('W', 'Wednesday'), ('Th', 'Thursday'), ('F', 'Friday')])
 	
