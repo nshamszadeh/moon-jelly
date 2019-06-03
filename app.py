@@ -609,11 +609,12 @@ def delmessages():
   else:
     flash('You are not an admin!')
     return redirect(url_for('logged_in_homepage'))
+  return render_template('messages.html', mtable=mtable)
 
 @app.route('/sendmessage', methods=['GET', 'POST'])
 @login_required
 def sendmessage():
-
+  
   mForm = MessageForm()
 
   if request.method == 'POST':
@@ -1121,7 +1122,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(T1)-3 ):
     nextslot = min_val(T1, spotlist[i], excludelist)
-    matrix[k][0].doctorID = nextslot.id
+    matrix[k][1].doctorID = nextslot.id
     excludelist.append(nextslot.id)
     k += 1
   matrix[8][1].doctorID = matrix[1][0].doctorID
@@ -1138,7 +1139,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(W1)-3 ):
     nextslot = min_val(W1, spotlist[i], excludelist)
-    matrix[k][0].doctorID = nextslot.id
+    matrix[k][2].doctorID = nextslot.id
     excludelist.append(nextslot.id)
     k += 1
   matrix[8][2].doctorID = matrix[1][1].doctorID
@@ -1155,7 +1156,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(Th1)-3 ):
     nextslot = min_val(Th1, spotlist[i], excludelist)
-    matrix[k][0].doctorID = nextslot.id
+    matrix[k][3].doctorID = nextslot.id
     excludelist.append(nextslot.id)
     k += 1
   matrix[8][3].doctorID = matrix[1][2].doctorID
@@ -1172,7 +1173,7 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(F1)-3 ):
     nextslot = min_val(F1, spotlist[i], excludelist)
-    matrix[k][0].doctorID = nextslot.id
+    matrix[k][4].doctorID = nextslot.id
     excludelist.append(nextslot.id)
     k += 1
   matrix[8][4].doctorID = matrix[1][3].doctorID
@@ -1279,7 +1280,7 @@ def min_val(inputlist, parameter, excludelist): #gives user with the minimum val
       # print( "i = ",i,"   j = " ,j)
       if inputlist[i].id == excludelist[j]:
         #print("broke at ", "j = ",j, "i = ",i)
-        print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
+        #print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
         break
       else:
         if j == len(excludelist)-1:
