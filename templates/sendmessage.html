@@ -1,0 +1,16 @@
+{% extends 'layout3.html' %}
+
+{% block body %}
+	<br>
+    <form action="" method="POST">
+	   		{% for field in mform  %}
+	   		<p>
+	   			{{field.label}}
+	   			{{field}}
+	   		</p>
+	   		{% endfor %}
+	   		<button>
+	   			Submit
+	   		</button>
+		</form>
+{% endblock %}

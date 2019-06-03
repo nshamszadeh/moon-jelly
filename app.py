@@ -2,7 +2,7 @@ import os
 import subprocess
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm, RequestForm
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm, RequestForm, MessageForm
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -85,7 +85,7 @@ class User(UserMixin, db.Model):
   firstpm = db.Column(db.Integer)
   second = db.Column(db.Integer)
   third = db.Column(db.Integer)
-  forth = db.Column(db.Integer)
+  fourth = db.Column(db.Integer)
   fifth = db.Column(db.Integer)
   sixth = db.Column(db.Integer)
   seventh = db.Column(db.Integer)
@@ -123,7 +123,7 @@ class User(UserMixin, db.Model):
     self.firstpm = 0
     self.second = 0
     self.third = 0
-    self.forth = 0
+    self.fourth = 0
     self.fifth = 0
     self.sixth = 0
     self.seventh = 0
@@ -268,41 +268,24 @@ class Users_That_Day(db.Model):
     self.S3 = S3
     #self.is_current = True
 
+class Messages2Admin(db.Model):
 
-#Qi use this one ##CHANGE FITH
-class Day(db.Model):
+  __tablename__ = "message_db" ##what does this do?
 
-  __tablename__ = "Days" ##what does this do?
+  # Each user (doctor) will have all these things attributed to him or her
+  id = db.Column(db.Integer, primary_key=True)
+  first_name = db.Column(db.Text)
+  last_name = db.Column(db.Text)
+  message = db.Column(db.Text)
+  def __init__(self,first_name,last_name,message):
+    self.first_name = first_name
+    self.last_name = last_name
+    self.message = message
 
-  # Each day of sechedule will have all these things
-  id = db.Column(db.Date, primary_key=True)
-
-  first_AM = db.Column(db.Integer)
-  first_PM = db.Column(db.Integer)
-  second = db.Column(db.Integer)
-  third = db.Column(db.Integer)
-  fourth = db.Column(db.Integer)
-  fith = db.Column(db.Integer)
-  sixth = db.Column(db.Integer)
-  seventh = db.Column(db.Integer)
-  PostCall = db.Column(db.Integer)
-  Is_Weekend = db.Column(db.Boolean)
-
-
-  # initialize the object
-  def __init__(self, Is_Weekend, first_AM, first_PM, second, third, fourth, fith, sixth, seventh, PostCall):
-    
-    self.Is_Weekend = Is_Weekend
-
-    self.first_AM = first_AM
-    self.first_PM = first_PM
-    self.second = second
-    self.third = third
-    self.fourth = fourth
-    self.fith = fith
-    self.sixth = sixth
-    self.seventh = seventh
-    self.PostCall = PostCall
+class MessageTable(Table):
+    first_name = Col('First Name')
+    last_name = Col('Last Name')
+    message = Col('Message')
 
 
 # database table
@@ -319,6 +302,8 @@ class UserTable(Table):
     firstpm= Col('firstpm')
     second = Col('second')
     third = Col('third')
+    fourth = Col('fourth')
+    fifth = Col('fifth')
 
 # this is used to save login states for each user
 @login_manager.user_loader
@@ -602,6 +587,46 @@ def users():
     flash('You are not an admin!')
     return redirect(url_for('logged_in_homepage'))
   return render_template('users.html', utable=utable)
+
+@app.route('/messages')
+@login_required
+def umessages():
+  if current_user.is_admin:
+    m = Messages2Admin.query.all()
+    mtable = MessageTable(m)
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
+  return render_template('messages.html', mtable=mtable)
+
+@app.route('/delmessages123')
+@login_required
+def delmessages():
+  if current_user.is_admin:
+    db.session.query(Messages2Admin).delete()
+    db.session.commit()
+    return redirect(url_for('umessages'))
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
+
+@app.route('/sendmessage', methods=['GET', 'POST'])
+@login_required
+def sendmessage():
+
+  mForm = MessageForm()
+
+  if request.method == 'POST':
+    first_name = current_user.first_name 
+    last_name = current_user.last_name
+    messaged = request.form['message']
+
+  if mForm.validate():
+    newMessage = Messages2Admin(first_name,last_name,messaged)
+    db.session.add(newMessage)
+    db.session.commit()
+
+  return render_template('sendmessage.html', mform = mForm)
 
 @app.route('/slots')
 def slots():
@@ -1059,7 +1084,7 @@ class SlotTable(Table):
 
 def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   #construct a schedule table with slots
-  spotlist = ["third", "forth", "fifth", "sixth", "seventh", "postcall"]
+  spotlist = ["third", "fourth", "fifth", "sixth", "seventh", "postcall"]
   #allusers = User.query.all()
 
   matrix = [[None for y in range(0,7)] for x in range(0,9)]
@@ -1420,16 +1445,27 @@ def schedule():
   #slots.filter_by()
 
   s = slots.query.all()
-
   grid = []
   grid2 = []
   grid3 = []
-  for i in range(0, 63, 7):
-    grid.append(s[i:i+7])
-  for i in range(63, 126, 7):
-    grid2.append(s[i:i+7])
-  for i in range(126, 189, 7):
-    grid3.append(s[i:i+7])
+
+  if s == []:
+    Nonelist = [None, None, None, None, None, None, None]
+    for i in range(0, 63, 7):
+     grid.append(Nonelist)
+    for i in range(63, 126, 7):
+     grid2.append(Nonelist)
+    for i in range(126, 189, 7):
+     grid3.append(Nonelist)
+
+
+  else:
+    for i in range(0, 63, 7):
+     grid.append(s[i:i+7])
+    for i in range(63, 126, 7):
+     grid2.append(s[i:i+7])
+    for i in range(126, 189, 7):
+     grid3.append(s[i:i+7])
   
 
   return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
