@@ -34,6 +34,10 @@ from flask_migrate import Migrate
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
+import psycopg2
+#import pandas
+import os.path
+
 app = Flask(__name__)
 #mail = Mail(app)
 
@@ -1010,7 +1014,7 @@ def make2():
           db.session.add(slot)
       
 
-      matrix3 = sorter(Su2, M2, T2, W2, Th2, F2, S2, nw3, nw4)[0]
+      matrix3 = sorter(Su3, M3, T3, W3, Th3, F3, S3, nw3, nw4)[0]
       for row in matrix3:
         for slot in row:
           db.session.add(slot)
@@ -1210,6 +1214,8 @@ def min_firstpm(userlist, first_am): #gives user with the minimum firstpm value 
              if userlist[i].firstpm < min_firstpm.firstpm:
                 min_firstpm = userlist[i]
                 ###### WHAT IF THERE ARE NO CARDIOS?
+          if min_firstpm == None:
+            min_firstpm = userlist[i]
           ####elif min_firstpm == None:
 
         else:                             #if not cardio, we need one
@@ -1262,7 +1268,7 @@ def min_val(inputlist, parameter, excludelist): #gives user with the minimum val
         break
       else:
         if j == len(excludelist)-1:
-          print ("add = True")
+          #print ("add = True")
           add = True
     if add == True:
       userlist.append(inputlist[i])
@@ -1321,9 +1327,9 @@ def min_val(inputlist, parameter, excludelist): #gives user with the minimum val
     #user.update().values(second = 1).where(user.id == min_val.id)
   
   if parameter == "third":
-    print("min_val.third before iterating =   ", min_val.third)
+    #print("min_val.third before iterating =   ", min_val.third)
     min_val.third += 1
-    print("min_val.third after iterating =   ", min_val.third)
+    #print("min_val.third after iterating =   ", min_val.third)
     #ival = min_val.third + 1
     #user.update().values(third = ival).where(user.id == min_val.id)
 
@@ -1440,7 +1446,67 @@ def schedule():
 
   return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
 
+@app.route("/csvout")
+@login_required
+def csvout():
+  #conn = psycopg2.connect("host=localhost dbname=postgres user=postgres") ##??
+  #cur = conn.cursor()
+  #cur.copy_expert('COPY "Users_That_Day_db" TO STDOUT WITH CSV HEADER', scheduleoutput)
+  #schedule = csv.writer(csvfile, delimiter=' ',
+  #                           quotechar='|', quoting=csv.QUOTE_MINIMAL)
+  #cur.copy_to(schedule, '"Users_That_Day_db"')
+
+  #All_User_Ids = Users_That_Day.query.all()
+
+
+  #map(lambda x: [x], csvData)
+
+
+  s = slots.query.all()
+  #u = users.quesry.all()
+  grid = []
+  grid2 = []
+  grid3 = []
+  for i in range(0, 63, 7):
+    grid.append(s[i:i+7])
+  for i in range(63, 126, 7):
+    grid2.append(s[i:i+7])
+  for i in range(126, 189, 7):
+    grid3.append(s[i:i+7])
   
+
+  with open(os.path.join(os.path.expanduser('~'),'Desktop','MoonJellySchedule.csv'), 'w') as csvFile:
+    fieldnames = ['Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Saturday','Sunday']
+    writer = csv.DictWriter(csvFile, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for i in grid:
+      print("i[0].doctor = ", i[0].doctor)
+      writer.writerow({'Monday': hasfirstname(i[0].doctor),'Tuesday': hasfirstname(i[1].doctor),'Wednesday': hasfirstname(i[2].doctor),'Thursday': hasfirstname(i[3].doctor),'Friday': hasfirstname(i[4].doctor),'Saturday': hasfirstname(i[5].doctor),'Sunday': hasfirstname(i[6].doctor)})
+    writer.writeheader()
+    for i in grid2:
+      writer.writerow({'Monday': hasfirstname(i[0].doctor),'Tuesday': hasfirstname(i[1].doctor),'Wednesday': hasfirstname(i[2].doctor),'Thursday': hasfirstname(i[3].doctor),'Friday': hasfirstname(i[4].doctor),'Saturday': hasfirstname(i[5].doctor),'Sunday': hasfirstname(i[6].doctor)})
+    writer.writeheader()
+    for i in grid3:
+      writer.writerow({'Monday': hasfirstname(i[0].doctor),'Tuesday': hasfirstname(i[1].doctor),'Wednesday': hasfirstname(i[2].doctor),'Thursday': hasfirstname(i[3].doctor),'Friday': hasfirstname(i[4].doctor),'Saturday': hasfirstname(i[5].doctor),'Sunday': hasfirstname(i[6].doctor)})
+
+
+  #this works
+  # with open('Slots.csv', 'w') as csvFile:
+  #   writer = csv.writer(csvFile)
+  #   writer.writerows(map(lambda x: [x], grid))
+
+  csvFile.close()
+
+  return redirect(url_for('schedule'))
+  
+def hasfirstname(User):
+  if User == None:
+    return(None)
+  else:
+    return(User.first_name)
+
+
 
 @app.route("/logout")
 @login_required

@@ -240,7 +240,7 @@
       {%for i in range(5)%}
        <td>{{matrix3[3][i].doctor.first_name}}</td>
       {%endfor%}       
-      <td class="table-info">{{matrix3[3][5].doctor.first_name}}</td>
+      <td class="table-info">{{matrix3[3][5].doctor.first_name}}</td> <!-- what is this?? -->
       <td class="table-info">{{matrix3[3][6].doctor.first_name}}</td>
     </tr>
     <tr>
@@ -276,7 +276,8 @@
   </tbody>
 </table>
 
-      <a href="/Jenny/UCSB" button type="button" class="btn btn-lg active" aria-pressed="true">Print</a>
+      <a href="/Jenny/UCSB" button type="button" class="btn btn-lg active" aria-pressed="true">Print PDF</a>
+      <a href="/csvout" button type="button" class="btn btn-lg active" aria-pressed="true">Export CSV</a>
 </div>
 
 
