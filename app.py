@@ -1475,7 +1475,7 @@ def csvout():
     grid3.append(s[i:i+7])
   
 
-  with open(os.path.join(os.path.expanduser('~'),'Desktop','MoonJellySchedule.csv'), 'w') as csvFile:
+  with open('MoonJellySchedule.csv', 'w') as csvFile:
     fieldnames = ['Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Saturday','Sunday']
     writer = csv.DictWriter(csvFile, fieldnames=fieldnames)
 
@@ -1490,13 +1490,18 @@ def csvout():
     for i in grid3:
       writer.writerow({'Monday': hasfirstname(i[0].doctor),'Tuesday': hasfirstname(i[1].doctor),'Wednesday': hasfirstname(i[2].doctor),'Thursday': hasfirstname(i[3].doctor),'Friday': hasfirstname(i[4].doctor),'Saturday': hasfirstname(i[5].doctor),'Sunday': hasfirstname(i[6].doctor)})
 
-
   #this works
   # with open('Slots.csv', 'w') as csvFile:
   #   writer = csv.writer(csvFile)
   #   writer.writerows(map(lambda x: [x], grid))
-
   csvFile.close()
+
+  csvFile = open('MoonJellySchedule.csv', 'r')
+  msg = Message('Moon Jelly Schedule CSV File', sender = 'moonjelly323@gmail.com', recipients = [current_user.email])
+  msg.body ='Attached to this email is the current schedule in CSV format.'
+  msg.attach('MoonJellySchedule.csv', 'MoonJellySchedule/csv', csvFile.read())
+  mail.send(msg)  
+  csvFile.close()  
 
   return redirect(url_for('schedule'))
   
