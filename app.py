@@ -561,7 +561,7 @@ def about():
   try:
     message = subprocess.check_output(['about'], shell=True)
   except:
-    message = "Sorry, we coundn't run that command..."
+    message = "The goal of this project is to create a personalized scheduler web app for groups of physicians."
   #dir:command you want to run(name)
   if not current_user.is_authenticated: # if not logged in
     return render_template('about.html', message=message)
