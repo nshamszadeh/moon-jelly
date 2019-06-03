@@ -26,6 +26,9 @@ class UserForm(FlaskForm):
 class EmailForm(FlaskForm):
 	email = StringField('Enter your email: ', [validators.DataRequired(message='Please Enter Something')])
 
+class MessageForm(FlaskForm):
+	message = StringField('Enter your message to the Admins', [validators.DataRequired(message='Please Enter Something')])
+
 class DeleteForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 	last_name = StringField('Last Name')
