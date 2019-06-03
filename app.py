@@ -2,7 +2,7 @@ import os
 import subprocess
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm
+from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm, RequestForm
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -13,7 +13,6 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 
 from io import StringIO
 from xhtml2pdf import pisa
-
 
 import csv
 from flask import Flask, make_response, render_template
@@ -39,17 +38,14 @@ import psycopg2
 import os.path
 
 app = Flask(__name__)
-#mail = Mail(app)
 
-
-# youve got mail
+# you've got mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'moonjelly323@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD'] # lol no password for u
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-
 
 #let website reload properly 
 app.config['ASSETS_DEBUG'] = True
@@ -61,22 +57,16 @@ app.config['SECRET_KEY'] = 'mOon_jElLy wAs oRiGiNa11y g0nNa b3 SuP3r MaRi0 gAlAx
 # im not mocking Aidan, this key actually needs to be secure which is why it looks all crazy
 # I feel personally attacked
 
-
-
 mail = Mail(app)
-
 
 db = SQLAlchemy(app) # wow we have a database
 migrate = Migrate(app, db)
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Create our database model. 
-
-
 #QI use this one
 class User(UserMixin, db.Model):
 
@@ -339,6 +329,9 @@ def load_user(user_id):
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxA(0, text, title, style)
 
+###################################
+#             ROUTES              #
+###################################
 
 @app.route('/<name>/<location>')
 
@@ -366,6 +359,8 @@ def homepage():
   else:
     if not current_user.is_authenticated:
       return render_template('home2.html') # else link the login page (admins add users)
+    elif current_user.is_admin:
+      return redirect(url_for('admin_homepage'))
     else:
       return redirect(url_for('logged_in_homepage'))
 
@@ -374,6 +369,10 @@ def homepage():
 def logged_in_homepage():
   return render_template('logged_home.html')
 
+@app.route('/admin_homepage')
+@login_required
+def admin_homepage():
+  return render_template('admin_home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -389,7 +388,6 @@ def login():
     else:
       form.email.errors.append('Invalid Email!')
   return render_template('login.html', form=form)
-
 
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def reset_password():
@@ -454,7 +452,7 @@ def register():
 
 def send_password_email(user):
   token = user.get_reset_token()
-  msg = Message('Set ur goddamn Password here',
+  msg = Message('Set your Moon Jelly Password Here!',
                 sender='moonjelly323@gmail.com',
                 recipients=[user.email])
   msg.body = f'''To set your password, visit the following link:
@@ -463,14 +461,11 @@ If you did not make this request then simply ignore this email and no changes wi
 '''
   mail.send(msg)
 
-
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
 def add():
   user_form = UserForm()
-  if current_user.is_admin == None:
-    return redirect(url_for('homepage'))
-  else:
+  if current_user.is_admin:
     if request.method == 'POST': # for some reason request.method is 'GET' now??
       first_name = request.form['first_name'] 
       last_name = request.form['last_name']
@@ -507,9 +502,12 @@ def add():
         db.session.add(new_user) # add to database
         db.session.commit() # for some reason we also need to commit it otherwise it won't add
         send_password_email(new_user)
-        return redirect(url_for('users')) # go to homepage again 
+        return redirect(url_for('users')) # go to users
     else:
       print(request.method)
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
   return render_template('add.html', form = user_form)
 
 
@@ -536,22 +534,25 @@ def set_token(token):
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
 def remove():
-  
-  delete_form = DeleteForm()
+  if current_user.is_admin:
+    delete_form = DeleteForm()
 
-  if request.method == 'POST':
-    Name2Rm = request.form['first_name']
-   
-    if delete_form.validate(): 
-      if User.query.filter_by(first_name = Name2Rm).first() != None:
-        toRM = User.query.filter_by(first_name = Name2Rm).first()
-        db.session.delete(toRM)
-        db.session.commit()
-        return redirect('/users')
+    if request.method == 'POST':
+      Name2Rm = request.form['first_name']
+     
+      if delete_form.validate(): 
+        if User.query.filter_by(first_name = Name2Rm).first() != None:
+          toRM = User.query.filter_by(first_name = Name2Rm).first()
+          db.session.delete(toRM)
+          db.session.commit()
+          return redirect('/users')
+        else:
+          print("User First Name Not Found")
       else:
-        print("User First Name Not Found")
-    else:
-      print("Invalid input(s)!")
+        print("Invalid input(s)!")
+  else:
+    flash('You not an admin!')
+    return redirect(url_for('logged_in_homepage'))
 
   return render_template('remove.html', delete_form = delete_form)
 
@@ -564,7 +565,7 @@ def about():
   try:
     message = subprocess.check_output(['about'], shell=True)
   except:
-    message = "Sorry, we coundn't run that command..."
+    message = "The goal of this project is to create a personalized scheduler web app for groups of physicians."
   #dir:command you want to run(name)
   if not current_user.is_authenticated: # if not logged in
     return render_template('about.html', message=message)
@@ -594,8 +595,12 @@ def contact():
 @app.route('/users')
 @login_required
 def users():
-  u = User.query.all()
-  utable = UserTable(u)
+  if current_user.is_admin:
+    u = User.query.all()
+    utable = UserTable(u)
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
   return render_template('users.html', utable=utable)
 
 @app.route('/slots')
@@ -606,82 +611,81 @@ def slots():
 
   #create a schedule page
 @app.route('/make', methods=['GET', 'POST'])
+@login_required
 def make():
 
-  numuForm = NumberUsersForm()
+  if current_user.is_admin:
+    numuForm = NumberUsersForm()
 
+    if request.method == 'POST':
 
-  if request.method == 'POST':
+      if(request.form['NumberUsersSu1'].isdigit()):
+        number_usersSu1 = int(request.form['NumberUsersSu1'])
 
-    if(request.form['NumberUsersSu1'].isdigit()):
-      number_usersSu1 = int(request.form['NumberUsersSu1'])
+      if(request.form['NumberUsersM1'].isdigit()):
+        number_usersM1 = int(request.form['NumberUsersM1'])
 
-    if(request.form['NumberUsersM1'].isdigit()):
-      number_usersM1 = int(request.form['NumberUsersM1'])
-
-    if(request.form['NumberUsersT1'].isdigit()):
-      number_usersT1 = int(request.form['NumberUsersT1'])
+      if(request.form['NumberUsersT1'].isdigit()):
+        number_usersT1 = int(request.form['NumberUsersT1'])
     
-    if(request.form['NumberUsersW1'].isdigit()):
-     number_usersW1 = int(request.form['NumberUsersW1'])
+      if(request.form['NumberUsersW1'].isdigit()):
+        number_usersW1 = int(request.form['NumberUsersW1'])
     
-    if(request.form['NumberUsersTh1'].isdigit()):
-     number_usersTh1 = int(request.form['NumberUsersTh1'])
+      if(request.form['NumberUsersTh1'].isdigit()):
+        number_usersTh1 = int(request.form['NumberUsersTh1'])
     
-    if(request.form['NumberUsersF1'].isdigit()):
-      number_usersF1 = int(request.form['NumberUsersF1'])
+      if(request.form['NumberUsersF1'].isdigit()):
+        number_usersF1 = int(request.form['NumberUsersF1'])
     
-    if(request.form['NumberUsersS1'].isdigit()):
-     number_usersS1 = int(request.form['NumberUsersS1'])
+      if(request.form['NumberUsersS1'].isdigit()):
+        number_usersS1 = int(request.form['NumberUsersS1'])
 
 
-    if(request.form['NumberUsersSu2'].isdigit()):
-      number_usersSu2 = int(request.form['NumberUsersSu2'])
+      if(request.form['NumberUsersSu2'].isdigit()):
+        number_usersSu2 = int(request.form['NumberUsersSu2'])
 
-    if(request.form['NumberUsersM2'].isdigit()):
-      number_usersM2 = int(request.form['NumberUsersM2'])
+      if(request.form['NumberUsersM2'].isdigit()):
+        number_usersM2 = int(request.form['NumberUsersM2'])
 
-    if(request.form['NumberUsersT2'].isdigit()):
-      number_usersT2 = int(request.form['NumberUsersT2'])
+      if(request.form['NumberUsersT2'].isdigit()):
+        number_usersT2 = int(request.form['NumberUsersT2'])
     
-    if(request.form['NumberUsersW2'].isdigit()):
-     number_usersW2 = int(request.form['NumberUsersW2'])
+      if(request.form['NumberUsersW2'].isdigit()):
+        number_usersW2 = int(request.form['NumberUsersW2'])
     
-    if(request.form['NumberUsersTh2'].isdigit()):
-     number_usersTh2 = int(request.form['NumberUsersTh2'])
+      if(request.form['NumberUsersTh2'].isdigit()):
+        number_usersTh2 = int(request.form['NumberUsersTh2'])
     
-    if(request.form['NumberUsersF2'].isdigit()):
-      number_usersF2 = int(request.form['NumberUsersF2'])
+      if(request.form['NumberUsersF2'].isdigit()):
+        number_usersF2 = int(request.form['NumberUsersF2'])
     
-    if(request.form['NumberUsersS2'].isdigit()):
-     number_usersS2 = int(request.form['NumberUsersS2'])
-
-
-    if(request.form['NumberUsersSu3'].isdigit()):
-      number_usersSu3 = int(request.form['NumberUsersSu3'])
-
-    if(request.form['NumberUsersM3'].isdigit()):
-      number_usersM3 = int(request.form['NumberUsersM3'])
-
-    if(request.form['NumberUsersT3'].isdigit()):
-      number_usersT3 = int(request.form['NumberUsersT3'])
-    
-    if(request.form['NumberUsersW3'].isdigit()):
-     number_usersW3 = int(request.form['NumberUsersW3'])
-    
-    if(request.form['NumberUsersTh3'].isdigit()):
-     number_usersTh3 = int(request.form['NumberUsersTh3'])
-    
-    if(request.form['NumberUsersF3'].isdigit()):
-      number_usersF3 = int(request.form['NumberUsersF3'])
-    
-    if(request.form['NumberUsersS3'].isdigit()):
-     number_usersS3 = int(request.form['NumberUsersS3'])
+      if(request.form['NumberUsersS2'].isdigit()):
+        number_usersS2 = int(request.form['NumberUsersS2'])
 
 
-       
-    if numuForm.validate(): 
-      new_number_users = Number_Users(number_usersSu1, 
+      if(request.form['NumberUsersSu3'].isdigit()):
+        number_usersSu3 = int(request.form['NumberUsersSu3'])
+
+      if(request.form['NumberUsersM3'].isdigit()):
+        number_usersM3 = int(request.form['NumberUsersM3'])
+
+      if(request.form['NumberUsersT3'].isdigit()):
+        number_usersT3 = int(request.form['NumberUsersT3'])
+    
+      if(request.form['NumberUsersW3'].isdigit()):
+        number_usersW3 = int(request.form['NumberUsersW3'])
+    
+      if(request.form['NumberUsersTh3'].isdigit()):
+        number_usersTh3 = int(request.form['NumberUsersTh3'])
+    
+      if(request.form['NumberUsersF3'].isdigit()):
+        number_usersF3 = int(request.form['NumberUsersF3'])
+    
+      if(request.form['NumberUsersS3'].isdigit()):
+        number_usersS3 = int(request.form['NumberUsersS3'])
+# I hate web development
+      if numuForm.validate(): 
+        new_number_users = Number_Users(number_usersSu1, 
                                       number_usersM1, 
                                       number_usersT1, 
                                       number_usersW1, 
@@ -702,96 +706,99 @@ def make():
                                       number_usersTh3, 
                                       number_usersF3, 
                                       number_usersS3)
-      db.session.add(new_number_users)
-      db.session.commit()
-      return redirect('/make2')
+        db.session.add(new_number_users)
+        db.session.commit()
+        return redirect('/make2')
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
   return render_template('make.html', numuForm = numuForm)
 
 @app.route('/make2', methods=['GET', 'POST'])
+@login_required
 def make2():
+  if current_user.is_admin:
+    allslots = slots.query.all()
+    if allslots != []:
+      db.session.query(slots).delete()
+      db.session.commit()
+      #.slots.query().delete()
 
-  allslots = slots.query.all()
-  if allslots != []:
-    db.session.query(slots).delete()
-    db.session.commit()
-    #.slots.query().delete()
+    Su1 = []
+    M1 = []
+    T1 = []
+    W1 = []
+    Th1 = []
+    F1 = []
+    S1 = []
 
-  Su1 = []
-  M1 = []
-  T1 = []
-  W1 = []
-  Th1 = []
-  F1 = []
-  S1 = []
+    Su2 = []
+    M2 = []
+    T2 = []
+    W2 = []
+    Th2 = []
+    F2 = []
+    S2 = []
 
-  Su2 = []
-  M2 = []
-  T2 = []
-  W2 = []
-  Th2 = []
-  F2 = []
-  S2 = []
+    Su3 = []
+    M3 = []
+    T3 = []
+    W3 = []
+    Th3 = []
+    F3 = []
+    S3 = []
 
-  Su3 = []
-  M3 = []
-  T3 = []
-  W3 = []
-  Th3 = []
-  F3 = []
-  S3 = []
+    Su1_id = []
+    M1_id = []
+    T1_id = []
+    W1_id = []
+    Th1_id = []
+    F1_id = []
+    S1_id = []
 
+    Su2_id = []
+    M2_id = []
+    T2_id = []
+    W2_id = []
+    Th2_id = []
+    F2_id = []
+    S2_id = []
 
-  Su1_id = []
-  M1_id = []
-  T1_id = []
-  W1_id = []
-  Th1_id = []
-  F1_id = []
-  S1_id = []
+    Su3_id = []
+    M3_id = []
+    T3_id = []
+    W3_id = []
+    Th3_id = []
+    F3_id = []
+    S3_id = []
 
-  Su2_id = []
-  M2_id = []
-  T2_id = []
-  W2_id = []
-  Th2_id = []
-  F2_id = []
-  S2_id = []
+    NU = Number_Users.query.all()
 
-  Su3_id = []
-  M3_id = []
-  T3_id = []
-  W3_id = []
-  Th3_id = []
-  F3_id = []
-  S3_id = []
+    userfirstNamesSu1 = ["first_name"]*NU[-1].number_usersSu1
+    userfirstNamesM1 = ["first_name"]*NU[-1].number_usersM1
+    userfirstNamesT1 = ["first_name"]*NU[-1].number_usersT1
+    userfirstNamesW1 = ["first_name"]*NU[-1].number_usersW1
+    userfirstNamesTh1 = ["first_name"]*NU[-1].number_usersTh1
+    userfirstNamesF1 = ["first_name"]*NU[-1].number_usersF1
+    userfirstNamesS1 = ["first_name"]*NU[-1].number_usersS1
 
-  NU = Number_Users.query.all()
+    userfirstNamesSu2 = ["first_name"]*NU[-1].number_usersSu2
+    userfirstNamesM2 = ["first_name"]*NU[-1].number_usersM2
+    userfirstNamesT2 = ["first_name"]*NU[-1].number_usersT2
+    userfirstNamesW2 = ["first_name"]*NU[-1].number_usersW2
+    userfirstNamesTh2 = ["first_name"]*NU[-1].number_usersTh2
+    userfirstNamesF2 = ["first_name"]*NU[-1].number_usersF2
+    userfirstNamesS2 = ["first_name"]*NU[-1].number_usersS2
 
-  userfirstNamesSu1 = ["first_name"]*NU[-1].number_usersSu1
-  userfirstNamesM1 = ["first_name"]*NU[-1].number_usersM1
-  userfirstNamesT1 = ["first_name"]*NU[-1].number_usersT1
-  userfirstNamesW1 = ["first_name"]*NU[-1].number_usersW1
-  userfirstNamesTh1 = ["first_name"]*NU[-1].number_usersTh1
-  userfirstNamesF1 = ["first_name"]*NU[-1].number_usersF1
-  userfirstNamesS1 = ["first_name"]*NU[-1].number_usersS1
+    userfirstNamesSu3 = ["first_name"]*NU[-1].number_usersSu3
+    userfirstNamesM3 = ["first_name"]*NU[-1].number_usersM3
+    userfirstNamesT3 = ["first_name"]*NU[-1].number_usersT3
+    userfirstNamesW3 = ["first_name"]*NU[-1].number_usersW3
+    userfirstNamesTh3 = ["first_name"]*NU[-1].number_usersTh3
+    userfirstNamesF3 = ["first_name"]*NU[-1].number_usersF3
+    userfirstNamesS3 = ["first_name"]*NU[-1].number_usersS3
 
-  userfirstNamesSu2 = ["first_name"]*NU[-1].number_usersSu2
-  userfirstNamesM2 = ["first_name"]*NU[-1].number_usersM2
-  userfirstNamesT2 = ["first_name"]*NU[-1].number_usersT2
-  userfirstNamesW2 = ["first_name"]*NU[-1].number_usersW2
-  userfirstNamesTh2 = ["first_name"]*NU[-1].number_usersTh2
-  userfirstNamesF2 = ["first_name"]*NU[-1].number_usersF2
-  userfirstNamesS2 = ["first_name"]*NU[-1].number_usersS2
-
-  userfirstNamesSu3 = ["first_name"]*NU[-1].number_usersSu3
-  userfirstNamesM3 = ["first_name"]*NU[-1].number_usersM3
-  userfirstNamesT3 = ["first_name"]*NU[-1].number_usersT3
-  userfirstNamesW3 = ["first_name"]*NU[-1].number_usersW3
-  userfirstNamesTh3 = ["first_name"]*NU[-1].number_usersTh3
-  userfirstNamesF3 = ["first_name"]*NU[-1].number_usersF3
-  userfirstNamesS3 = ["first_name"]*NU[-1].number_usersS3
-
-  SchedForm = ScheduleForm(request.form,
+    SchedForm = ScheduleForm(request.form,
                            userfirstNamesSu1=userfirstNamesSu1,
                            userfirstNamesM1=userfirstNamesM1,
                            userfirstNamesT1=userfirstNamesT1,
@@ -816,227 +823,218 @@ def make2():
   
 
 
-  if request.method == 'POST':
+    if request.method == 'POST':
     
-    for entry in SchedForm.userfirstNamesSu1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Su1_id.append(U1.id)
+      for entry in SchedForm.userfirstNamesSu1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Su1_id.append(U1.id)
 
-        Su1.append(U1) #bug here, said M1.append(U1)
+          Su1.append(U1) #bug here, said M1.append(U1)
 
-      else:
-        print("not a valid first name")
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesM1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        M1_id.append(U1.id)
-        M1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesM1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          M1_id.append(U1.id)
+          M1.append(U1)
+        else:
+          print("not a valid first name")
     
-    for entry in SchedForm.userfirstNamesT1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        T1_id.append(U1.id)
-        T1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesT1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          T1_id.append(U1.id)
+          T1.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesW1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        W1_id.append(U1.id)
-        W1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesW1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          W1_id.append(U1.id)
+          W1.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesTh1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Th1_id.append(U1.id)
-        Th1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesTh1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Th1_id.append(U1.id)
+          Th1.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesF1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        F1_id.append(U1.id)
-        F1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesF1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          F1_id.append(U1.id)
+          F1.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesS1.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        S1_id.append(U1.id)
-        S1.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesS1.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          S1_id.append(U1.id)
+          S1.append(U1)
+        else:
+          print("not a valid first name")
 
+      for entry in SchedForm.userfirstNamesSu2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Su2_id.append(U1.id)
+          Su2.append(U1)
+        else:
+          print("not a valid first name")
 
-
-    for entry in SchedForm.userfirstNamesSu2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Su2_id.append(U1.id)
-        Su2.append(U1)
-      else:
-        print("not a valid first name")
-
-    for entry in SchedForm.userfirstNamesM2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        M2_id.append(U1.id)
-        M2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesM2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          M2_id.append(U1.id)
+          M2.append(U1)
+        else:
+          print("not a valid first name")
     
-    for entry in SchedForm.userfirstNamesT2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        T2_id.append(U1.id)
-        T2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesT2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          T2_id.append(U1.id)
+          T2.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesW2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        W2_id.append(U1.id)
-        W2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesW2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          W2_id.append(U1.id)
+          W2.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesTh2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Th2_id.append(U1.id)
-        Th2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesTh2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Th2_id.append(U1.id)
+          Th2.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesF2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        F2_id.append(U1.id)
-        F2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesF2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          F2_id.append(U1.id)
+          F2.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesS2.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        S2_id.append(U1.id)
-        S2.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesS2.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          S2_id.append(U1.id)
+          S2.append(U1)
+        else:
+          print("not a valid first name")
 
+      for entry in SchedForm.userfirstNamesSu3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Su3_id.append(U1.id)
+          Su3.append(U1)
+        else:
+          print("not a valid first name")
 
-
-
-    for entry in SchedForm.userfirstNamesSu3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Su3_id.append(U1.id)
-        Su3.append(U1)
-      else:
-        print("not a valid first name")
-
-    for entry in SchedForm.userfirstNamesM3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        M3_id.append(U1.id)
-        M3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesM3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          M3_id.append(U1.id)
+          M3.append(U1)
+        else:
+          print("not a valid first name")
     
-    for entry in SchedForm.userfirstNamesT3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        T3_id.append(U1.id)
-        T3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesT3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          T3_id.append(U1.id)
+          T3.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesW3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        W3_id.append(U1.id)
-        W3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesW3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          W3_id.append(U1.id)
+          W3.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesTh3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        Th3_id.append(U1.id)
-        Th3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesTh3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          Th3_id.append(U1.id)
+          Th3.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesF3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        F3_id.append(U1.id)
-        F3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesF3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          F3_id.append(U1.id)
+          F3.append(U1)
+        else:
+          print("not a valid first name")
 
-    for entry in SchedForm.userfirstNamesS3.entries:
-      if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
-        U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
-        S3_id.append(U1.id)
-        S3.append(U1)
-      else:
-        print("not a valid first name")
+      for entry in SchedForm.userfirstNamesS3.entries:
+        if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
+          U1 = User.query.filter_by(first_name=entry.data.get("first_name")).first()
+          S3_id.append(U1.id)
+          S3.append(U1)
+        else:
+          print("not a valid first name")
 
+      if SchedForm.validate(): 
+        new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id, Su2_id, M2_id, T2_id, W2_id, Th2_id, F2_id, S2_id, Su3_id, M3_id, T3_id, W3_id, Th3_id, F3_id, S3_id)
+        db.session.add(new_users_that_day) # add to database
 
-    if SchedForm.validate(): 
-      new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id, Su2_id, M2_id, T2_id, W2_id, Th2_id, F2_id, S2_id, Su3_id, M3_id, T3_id, W3_id, Th3_id, F3_id, S3_id)
-      db.session.add(new_users_that_day) # add to database
+        #sorter2(Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2) 
+        #print("min_val(Su1, second) = ", min_val(Su1, 'second'))
+        #M, nw1, nw2 = sorter(parameter)
 
+        matrix, nw1, nw2 = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None)    
+        for row in matrix:
+          for slot in row:
+            db.session.add(slot)
 
-      #sorter2(Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2) 
-      #print("min_val(Su1, second) = ", min_val(Su1, 'second'))
-      #M, nw1, nw2 = sorter(parameter)
-
-      matrix, nw1, nw2 = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None)    
-      for row in matrix:
-        for slot in row:
-          db.session.add(slot)
-
-      matrix2, nw3, nw4 = sorter(Su2, M2, T2, W2, Th2, F2, S2, nw1, nw2)    
-      for row in matrix2:
-        for slot in row:
-          db.session.add(slot)
-      
+        matrix2, nw3, nw4 = sorter(Su2, M2, T2, W2, Th2, F2, S2, nw1, nw2)    
+        for row in matrix2:
+          for slot in row:
+            db.session.add(slot)
 
       matrix3 = sorter(Su3, M3, T3, W3, Th3, F3, S3, nw3, nw4)[0]
       for row in matrix3:
         for slot in row:
           db.session.add(slot)
       
-
       db.session.commit()
       return(redirect('/schedule'))
 
-  
-  print("SchedForm.errors = ", SchedForm.errors)
-  #print("Su1 = ",Su1)
-  
-  # s = slots.query.all()
-  # grid = []
-  # for i in range(0, len(s), 7):
-  #  grid.append(s[i:i+7])
-
-  return render_template('make2.html',schedForm = SchedForm)
+    print("SchedForm.errors = ", SchedForm.errors)
+    #print("Su1 = ",Su1)
+    
+    # s = slots.query.all()
+    # grid = []
+    # for i in range(0, len(s), 7):
+    #  grid.append(s[i:i+7])
+  else:
+    flash('You are not an admin!')
+    return redirect(url_for('logged_in_homepage'))
+  return render_template('make2.html', schedForm = SchedForm)
 
 
 class slots(db.Model):
-
 
   __tablename__ = "slots_db"
 
@@ -1062,8 +1060,6 @@ class SlotTable(Table):
 def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   #construct a schedule table with slots
   spotlist = ["third", "forth", "fifth", "sixth", "seventh", "postcall"]
-
-
   #allusers = User.query.all()
 
   matrix = [[None for y in range(0,7)] for x in range(0,9)]
@@ -1122,7 +1118,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
     k += 1
   matrix[8][2].doctorID = matrix[1][1].doctorID
 
-
   #Thursday 1
   firstam = min_firstam(Th1)
   firstpm = min_firstpm(Th1, firstam)
@@ -1140,9 +1135,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
     k += 1
   matrix[8][3].doctorID = matrix[1][2].doctorID
 
-
-
-
   #friday 1
   firstam = min_firstam(F1)
   firstpm = min_firstpm(F1, firstam)
@@ -1159,7 +1151,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
     excludelist.append(nextslot.id)
     k += 1
   matrix[8][4].doctorID = matrix[1][3].doctorID
-
 
   #saturday 1
   matrix[0][5].doctorID = second.id #second on friday = first am/pm on saturday
@@ -1183,7 +1174,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   #sort so every user gets around the same number of spots
   #if there are less users than spots, dont fill the higher numbered spots
   #whoever works 'first_PM' will work 'PostCall' the next day always
-
 
 def min_firstam(userlist): #gives user with the minimum firstam value from a list of users
   min_firstam = None
@@ -1377,8 +1367,6 @@ def min_val_check(inputlist, parameter, excludelist): #gives user with the minim
     if add == True:
       userlist.append(inputlist[i])
           
-
-
   for i in range(0,len(userlist)):
     if i == 0:
       min_val = userlist[i]
