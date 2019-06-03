@@ -38,7 +38,6 @@ class ScheduleEntryForm(FlaskForm):
 	first_name = StringField('First Name', [validators.DataRequired(message = 'Please Enter Something')])
 
 class ScheduleForm(FlaskForm):
-	
 	userfirstNamesM1 = FieldList(FormField(ScheduleEntryForm), min_entries=3, max_entries = 7)
 	userfirstNamesT1 = FieldList(FormField(ScheduleEntryForm), min_entries=3, max_entries = 7)
 	userfirstNamesW1 = FieldList(FormField(ScheduleEntryForm), min_entries=3, max_entries = 7)
@@ -64,7 +63,6 @@ class ScheduleForm(FlaskForm):
 	userfirstNamesSu3 = FieldList(FormField(ScheduleEntryForm), min_entries=1)
 
 class NumberUsersForm(FlaskForm):
-	
 	NumberUsersM1 = IntegerField('# Working on first Monday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
 	NumberUsersT1 = IntegerField('# Working on first Tuesday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
 	NumberUsersW1 = IntegerField('# Working on first Wednesday', [validators.DataRequired(message = 'Please Enter Something')], default=3)
@@ -90,6 +88,5 @@ class NumberUsersForm(FlaskForm):
 	NumberUsersSu3 = IntegerField('# Working on third Sunday', [validators.DataRequired(message = 'Please Enter Something')], default=1)
 	
 class RequestForm(FlaskForm):
-
-	post_call = SelectField('Select when you want post call:', choices = [('M', 'Monday'), ('T', 'Tuesday'), ('W', 'Wednesday'), ('Th', 'Thursday'), ('F', 'Friday')])
-	
+	post_call = SelectField('Select when you want post call:', choices = [(None, 'No Preference'), ('M1', 'Monday Week 1'), ('T1', 'Tuesday Week 1'), ('W1', 'Wednesday Week 1'), ('Th1', 'Thursday Week 1'), ('F1', 'Friday Week 1'),('M2', 'Monday Week 2'), ('T2', 'Tuesday Week 2'), ('W2', 'Wednesday Week 2'), ('Th2', 'Thursday Week 2'), ('F2', 'Friday Week 2'),('M3', 'Monday Week 3'), ('T3', 'Tuesday Week 3'), ('W3', 'Wednesday Week 3'), ('Th3', 'Thursday Week 3'), ('F3', 'Friday Week 3')])
+	third_call = SelectField('Select when you want weekend third call:', choices = [(None, 'No Preference'), ('Sat1', 'Saturday Week 1'), ('Sun1', 'Sunday Week 1'), ('Sat2', 'Saturday Week 2'), ('Sun2', 'Sunday Week 2'), ('Sat3', 'Saturday Week 3'), ('Sun3', 'Sunday Week 3')])

@@ -1,34 +1,19 @@
 import os
+import csv
 import subprocess
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, UserForm, DeleteForm, RegisterForm, SetPasswordForm, EmailForm, ScheduleForm, ScheduleEntryForm, NumberUsersForm, RequestForm
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
-from io import StringIO
-from xhtml2pdf import pisa
-
-import csv
-from flask import Flask, make_response, render_template
-from flask import Flask, request, jsonify
-#import flask_excel as excel
-
-import pdfkit 
-
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, make_response, render_template, flash, request, redirect, url_for, jsonify
 from flask_table import Table, Col 
-from flask import Flask, render_template, redirect, url_for
-#from flask_mail import Mail, Message
-
 from flask_mail import Mail, Message
 from flask import make_response, Flask, render_template, request, redirect, send_from_directory, flash, url_for, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_table import Table, Col
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -1430,6 +1415,13 @@ def schedule():
 
   return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
 
+@app.route('/requests')
+@login_required
+def requests():
+  request_form = RequestForm()
+  post_call = request.form['post_call']
+  third_call = request.form['third_cal']
+  return render_template('reqyests.html', form = request_form)
   
 
 @app.route("/logout")
