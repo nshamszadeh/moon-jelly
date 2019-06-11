@@ -11,8 +11,6 @@ from app import app, db, User
 
 @pytest.fixture
 def client():
-    dburi = 'postgres://postgres:l315l315@localhost/moon_jelly_test'
-    app.config['SQLALCHEMY_DATABASE_URI'] = dburi
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False 
     client = app.test_client()
