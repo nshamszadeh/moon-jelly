@@ -1,5 +1,7 @@
 language: python
 script: pytest
+env: 
+  - MAIL_PASSWORD=123
 deploy:
   provider: heroku
   api_key:
