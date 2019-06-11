@@ -8,10 +8,3 @@ services:
   - postgresql 
 before_script:
   - psql -c 'create database moon_jelly_test;' -U postgres 
-deploy:
-  provider: heroku
-  api_key:
-    secure: JwBPOwarRt/oOnP0RuKD4IoU5QEhNzpaYxv9o6cbxycBTeugVMBtJN4IBvD05qcMZatOd1Y51snEFHl/2REif6vK99/r6pkp4mHrI6607mOZQwhH+TlYmULIAqS2BdQGrejEIMYIaNwKkztQzlp5JP37hjphigAg4QXL3G91cc+jK2D7KnrU8TUsgG35nwSrYiEir0W3FmiTxzw9jf+avb9QQOjsSUChqRHuluaTvbbOb5Eae0GMs7pcEE4puIYcAqmQCsYHBRk5U/xcA1ielKz5cCQhqrQlBmTPtKuI9xv6rcz8MvFg6MQ7L+oMpafikEz2OfMBRAhZMJsYjZPY+D15XsgFjdMZAYhPg3KCuPu9OcopZVvXX2STxZSRZlDD/Y8pZL2sS4+f3se+G1TYVDulEzl73hhr6ZUx/l7DprFrY32zFOppRfS+bLndCyTJ9ZA2mxlSsXUIL3ddmEbhjPVnqQmkeqgeoQy/INvmVAiGGVs100HYjhhhHOsgn+QmQGvb93aI8yiIt5SxoI9qfeSq5zhyoNoV17DQP8VkudGm5Hf2p8Pesc21ogsiiqb4SdVb+FGLmIFf32EAoU5I4Ww9vLSI0YR1z78Ulb1JQZiqrqbFn7I+c3nrEG/8DAs3l/i8UaiRGVWD8nU6qET1D3H16Y22k2GLltzsrfGlTyI=
-  app: moon-jelly
-  on:
-    repo: nshamszadeh/moon-jelly
