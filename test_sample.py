@@ -79,7 +79,7 @@ def test_add_user(client):
     client.post('/add', data=dict(
         first_name='b',
         last_name='b',
-        email='b@gmail.com',
+        email='jingjingyu@ucsb.edu',
         is_cardio='1',
         is_admin='0'
     ),follow_redirects=True)
