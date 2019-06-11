@@ -2,7 +2,7 @@ language: python
 script: pytest test_sample.py
 env: 
   global:
-    - MAIL_PASSWORD=123
+    - MAIL_PASSWORD=MoonJelly323#@#
     - DATABASE_URL=postgres://postgres@localhost/moon_jelly_test
 services:
   - postgresql 
