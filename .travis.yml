@@ -1,8 +1,9 @@
 language: python
 script: pytest
 env: 
-  - MAIL_PASSWORD=123
-  - DATABASE_URL=postgres://postgres:l315l315@localhost/moon_jelly_test
+  global:
+    - MAIL_PASSWORD=123
+    - DATABASE_URL=postgres://postgres:l315l315@localhost/moon_jelly_test
 services:
   - postgresql 
 before_script:
