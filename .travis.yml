@@ -1,5 +1,5 @@
 language: python
-script: pytest
+script: pytest test_sample.py
 env: 
   global:
     - MAIL_PASSWORD=123
