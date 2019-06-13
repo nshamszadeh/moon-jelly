@@ -1,0 +1,34 @@
+{% extends 'layout3.html' %}
+<head>
+<style>
+.btn {
+  border: 2px solid black;
+  background-color: green;
+  color: black;
+  padding: 8px 16px;
+  font-size: 8px;
+  cursor: pointer;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+</head>
+
+
+{% block body %}
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+
+    <h1 class="display-7">Are you sure you want to remove a user?</h1>
+    <p align="center"><font size="5"><strong>This will delete the current schedule</strong></font>
+    <hr>
+    <a href="/remove" button type="button" class="btn btn-lg active" aria-pressed="true">Choose A User To Remove</a>
+
+  </div>
+</div>
+</div>
+{% endblock %}

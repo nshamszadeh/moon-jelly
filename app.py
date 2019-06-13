@@ -519,10 +519,25 @@ def set_token(token):
   return render_template('set_password.html', form=form)
 
 
+@app.route('/deletewarning')
+@login_required
+def deletewarning():
+  if current_user.is_admin is False:
+    flash('You not an admin!')
+    return redirect(url_for('logged_in_homepage'))
+
+  return render_template('deletewarning.html')
+
 @app.route('/remove', methods = ['GET', 'POST'])
 @login_required
 def remove():
   if current_user.is_admin:
+
+    allslots = slots.query.all()
+    if allslots != []:
+      db.session.query(slots).delete()
+      db.session.commit()
+
     delete_form = DeleteForm()
 
     if request.method == 'POST':
@@ -753,6 +768,8 @@ def make2():
       db.session.commit()
       #.slots.query().delete()
 
+    error = None
+
     Su1 = []
     M1 = []
     T1 = []
@@ -862,7 +879,8 @@ def make2():
           Su1.append(U1) #bug here, said M1.append(U1)
 
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Sunday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesM1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -870,7 +888,8 @@ def make2():
           M1_id.append(U1.id)
           M1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Monday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
     
       for entry in SchedForm.userfirstNamesT1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -878,7 +897,8 @@ def make2():
           T1_id.append(U1.id)
           T1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Tuesday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesW1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -886,7 +906,8 @@ def make2():
           W1_id.append(U1.id)
           W1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Wednesday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesTh1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -894,7 +915,8 @@ def make2():
           Th1_id.append(U1.id)
           Th1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Thursday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesF1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -902,7 +924,8 @@ def make2():
           F1_id.append(U1.id)
           F1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Friday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesS1.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -910,7 +933,8 @@ def make2():
           S1_id.append(U1.id)
           S1.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Saturday 1'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesSu2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -918,7 +942,8 @@ def make2():
           Su2_id.append(U1.id)
           Su2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Sunday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesM2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -926,7 +951,8 @@ def make2():
           M2_id.append(U1.id)
           M2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Monday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
     
       for entry in SchedForm.userfirstNamesT2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -934,7 +960,8 @@ def make2():
           T2_id.append(U1.id)
           T2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Tuesday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesW2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -942,7 +969,8 @@ def make2():
           W2_id.append(U1.id)
           W2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Wenesday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesTh2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -950,7 +978,8 @@ def make2():
           Th2_id.append(U1.id)
           Th2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Thursday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesF2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -958,7 +987,8 @@ def make2():
           F2_id.append(U1.id)
           F2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Friday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesS2.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -966,7 +996,8 @@ def make2():
           S2_id.append(U1.id)
           S2.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Saturday 2'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesSu3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -974,7 +1005,8 @@ def make2():
           Su3_id.append(U1.id)
           Su3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Sunday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesM3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -982,7 +1014,8 @@ def make2():
           M3_id.append(U1.id)
           M3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Monday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
     
       for entry in SchedForm.userfirstNamesT3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -990,7 +1023,8 @@ def make2():
           T3_id.append(U1.id)
           T3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Tuesday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesW3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -998,7 +1032,8 @@ def make2():
           W3_id.append(U1.id)
           W3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Wednesday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesTh3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -1006,7 +1041,8 @@ def make2():
           Th3_id.append(U1.id)
           Th3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Thursday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesF3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -1014,7 +1050,8 @@ def make2():
           F3_id.append(U1.id)
           F3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Friday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
       for entry in SchedForm.userfirstNamesS3.entries:
         if User.query.filter_by(first_name=entry.data.get("first_name")).first() != None:
@@ -1022,15 +1059,12 @@ def make2():
           S3_id.append(U1.id)
           S3.append(U1)
         else:
-          print("not a valid first name")
+          error = 'Invalid First Name in Saturday 3'
+          return render_template('make2.html', schedForm = SchedForm, error = error)
 
-      if SchedForm.validate(): 
+      if SchedForm.validate() and error == None: 
         new_users_that_day = Users_That_Day(Su1_id, M1_id, T1_id, W1_id, Th1_id, F1_id, S1_id, Su2_id, M2_id, T2_id, W2_id, Th2_id, F2_id, S2_id, Su3_id, M3_id, T3_id, W3_id, Th3_id, F3_id, S3_id)
         db.session.add(new_users_that_day) # add to database
-
-        #sorter2(Su1, M1, T1, W1, Th1, F1, S1, Su2, M2, T2, W2, Th2, F2, S2) 
-        #print("min_val(Su1, second) = ", min_val(Su1, 'second'))
-        #M, nw1, nw2 = sorter(parameter)
 
         matrix, nw1, nw2 = sorter(Su1, M1, T1, W1, Th1, F1, S1, None, None)    
         for row in matrix:
@@ -1042,25 +1076,20 @@ def make2():
           for slot in row:
             db.session.add(slot)
 
-      matrix3 = sorter(Su3, M3, T3, W3, Th3, F3, S3, nw3, nw4)[0]
-      for row in matrix3:
-        for slot in row:
-          db.session.add(slot)
+        matrix3 = sorter(Su3, M3, T3, W3, Th3, F3, S3, nw3, nw4)[0]
+        for row in matrix3:
+          for slot in row:
+            db.session.add(slot)
       
-      db.session.commit()
-      return(redirect('/schedule'))
+        db.session.commit()
+        return(redirect('/schedule'))
 
     print("SchedForm.errors = ", SchedForm.errors)
-    #print("Su1 = ",Su1)
-    
-    # s = slots.query.all()
-    # grid = []
-    # for i in range(0, len(s), 7):
-    #  grid.append(s[i:i+7])
+
   else:
     flash('You are not an admin!')
     return redirect(url_for('logged_in_homepage'))
-  return render_template('make2.html', schedForm = SchedForm)
+  return render_template('make2.html', schedForm = SchedForm, error = error)
 
 
 class slots(db.Model):
@@ -1107,7 +1136,6 @@ def sorter(Su1, M1, T1, W1, Th1, F1, S1, notweekend1, notweekend2):
   k = 3 
   excludelist = [firstam.id, firstpm.id, second.id]
   for i in range(0 , len(M1)-3 ):
-    #print("i = ", i, "      :     nextslot = min_val(M1,", spotlist[i],",excludelist) = ", min_val(M1, spotlist[i],excludelist))
     nextslot = min_val(M1, spotlist[i], excludelist)
     matrix[k][0].doctorID = nextslot.id
     excludelist.append(nextslot.id)
@@ -1261,6 +1289,7 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
     if first_am.id != userlist[i].id and first_pm.id != userlist[i].id :  #isnt first_am or first_pm
       if min_second == None:
         min_second = userlist[i]
+        print("min_second = ", min_second)
       else:
         if userlist[i].second < min_second.second:
           min_second = userlist[i]
@@ -1274,27 +1303,18 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
 def min_val(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users
   min_val = None
 
-  #print("parameter = " , parameter)
-
   userlist = [] 
   for i in range(0,len(inputlist)):
     add = False
     for j in range(0,len(excludelist)):
-      # print( "i = ",i,"   j = " ,j)
       if inputlist[i].id == excludelist[j]:
-        #print("broke at ", "j = ",j, "i = ",i)
-        #print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
         break
       else:
         if j == len(excludelist)-1:
-          #print ("add = True")
+
           add = True
     if add == True:
       userlist.append(inputlist[i])
-
-  #print("inputlist = ", inputlist)
-  #print("excludelist = ", excludelist)
-  #print("userlist = ", userlist)
 
 
 
@@ -1436,17 +1456,6 @@ def min_val_check(inputlist, parameter, excludelist): #gives user with the minim
 
 @app.route('/schedule')
 def schedule():
- # NU = Number_Users.query.all()
- # s = []
- # grid = []
-  
-  #for j in range(1*NU[-1].id, 8*NU[-1].id):
-   # s.append(slots.query.filter_by(daynumber=j))
-
-  #for i in range(0,len(s)):
-  #  grid.append(s[i:i+7])
-
-  #slots.filter_by()
 
   s = slots.query.all()
   grid = []
@@ -1462,6 +1471,10 @@ def schedule():
     for i in range(126, 189, 7):
      grid3.append(Nonelist)
 
+    print("grid[3][1] = ", grid[3][1])
+    return render_template('emptyschedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
+
+
 
   else:
     for i in range(0, 63, 7):
@@ -1470,9 +1483,8 @@ def schedule():
      grid2.append(s[i:i+7])
     for i in range(126, 189, 7):
      grid3.append(s[i:i+7])
-  
 
-  return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
+    return render_template('schedule.html', matrix = grid, matrix2 = grid2, matrix3 = grid3)
 
 @app.route("/csvout")
 @login_required

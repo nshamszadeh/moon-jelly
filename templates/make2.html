@@ -10,7 +10,6 @@ label {display: none;}
 </style>
 </head>
 
-
 <div id="schedule">
 <div class="container-fluid padding">
 <div class="row welcome text-center">
@@ -19,6 +18,10 @@ label {display: none;}
   </div>
 </div>
 </div>
+
+{% if error %}
+    <p align="center"><font size="5"><strong>Error:</strong> <i>{{ error }}</i></font>
+{% endif %}
 
 <div class="row">
  <div class="col">
