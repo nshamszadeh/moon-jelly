@@ -1289,7 +1289,6 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
     if first_am.id != userlist[i].id and first_pm.id != userlist[i].id :  #isnt first_am or first_pm
       if min_second == None:
         min_second = userlist[i]
-        print("min_second = ", min_second)
       else:
         if userlist[i].second < min_second.second:
           min_second = userlist[i]

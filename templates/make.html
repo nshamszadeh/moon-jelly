@@ -5,7 +5,14 @@
 body {background-color: powderblue;}
 </style>
 </head>
-
+<div id="schedule">
+<div class="container-fluid padding">
+<div class="row welcome text-center">
+  <div class="col-12">
+    <h1 class="display-7">How many working each day?</h1>
+  </div>
+</div>
+</div>
      <form action="" method="POST">
         <hr>
             {% for field in numuForm  %}
@@ -14,6 +21,7 @@ body {background-color: powderblue;}
                 {{field}}
             </p>
             {% endfor %}
+            <p align="left"><font size="3"><strong>Warning:</strong> Submitting this will delete current schedule</font> </p>
             <button>
                 Submit
             </button>
