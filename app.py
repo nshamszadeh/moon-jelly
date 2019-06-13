@@ -648,7 +648,7 @@ def sendmessage():
   return render_template('sendmessage.html', mform = mForm)
 
 @app.route('/slots')
-def slots():
+def slottable():
   u = slots.query.all()
   utable = SlotTable(u)
   return render_template('users.html', utable=utable)
