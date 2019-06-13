@@ -443,11 +443,11 @@ def send_password_email(user):
   msg = Message('Set your Moon Jelly Password Here!',
                 sender='moonjelly323@gmail.com',
                 recipients=[user.email])
-#   msg.body = f'''To set your password, visit the following link:
-# {url_for('set_token', token=token, _external=True)}
-# If you did not make this request then simply ignore this email and no changes will be made.
-# '''
-#   mail.send(msg)
+  msg.body = f'''To set your password, visit the following link:
+{url_for('set_token', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+  mail.send(msg)
 
 @app.route('/add', methods = ['GET', 'POST'])
 @login_required
@@ -1303,27 +1303,18 @@ def min_second(userlist, first_am, first_pm): #gives user with the minimum secon
 def min_val(inputlist, parameter, excludelist): #gives user with the minimum value of a parameter from a list of users
   min_val = None
 
-  #print("parameter = " , parameter)
-
   userlist = [] 
   for i in range(0,len(inputlist)):
     add = False
     for j in range(0,len(excludelist)):
-      # print( "i = ",i,"   j = " ,j)
       if inputlist[i].id == excludelist[j]:
-        #print("broke at ", "j = ",j, "i = ",i)
-        #print("inputlist[",i,"] = ", inputlist[i], "   excludelist[",j,"] = ",excludelist[j])
         break
       else:
         if j == len(excludelist)-1:
-          #print ("add = True")
+
           add = True
     if add == True:
       userlist.append(inputlist[i])
-
-  #print("inputlist = ", inputlist)
-  #print("excludelist = ", excludelist)
-  #print("userlist = ", userlist)
 
 
 
@@ -1465,17 +1456,6 @@ def min_val_check(inputlist, parameter, excludelist): #gives user with the minim
 
 @app.route('/schedule')
 def schedule():
- # NU = Number_Users.query.all()
- # s = []
- # grid = []
-  
-  #for j in range(1*NU[-1].id, 8*NU[-1].id):
-   # s.append(slots.query.filter_by(daynumber=j))
-
-  #for i in range(0,len(s)):
-  #  grid.append(s[i:i+7])
-
-  #slots.filter_by()
 
   s = slots.query.all()
   grid = []
